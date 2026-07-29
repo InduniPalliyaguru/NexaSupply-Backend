@@ -6,13 +6,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    boolean existsUserByEmailAndDataStatus_Active(String email, DataStatus dataStatus);
+    User findByEmailAndDataStatus_Active(String email, DataStatus dataStatus);
 
-    @Query ("SELECT COUNT(u) FROM User u")
+    @Query("SELECT COUNT(u) FROM User u")
     long countAllUsers();
 }

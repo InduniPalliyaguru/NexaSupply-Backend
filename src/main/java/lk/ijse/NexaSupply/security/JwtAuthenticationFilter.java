@@ -8,7 +8,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lk.ijse.NexaSupply.constant.CommonResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,13 +19,14 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
-import java.nio.charset.MalformedInputException;
+
+import io.jsonwebtoken.MalformedJwtException;
 
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtUtil  jwtUtil;
+    private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
     private final ObjectMapper objectMapper;
 
@@ -55,11 +55,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
             filterChain.doFilter(request, response);
-        } catch (ExpiredJwtException ex ) {
+        } catch (ExpiredJwtException ex) {
             handleJwtException(response, 401, "Token is expired");
         } catch (SignatureException ex) {
             handleJwtException(response, 401, "Invalid token signature");
-        } catch (MalformedInputException ex) {
+        } catch (MalformedJwtException ex) {
             handleJwtException(response, 401, "Invalid token format");
         } catch (Exception ex) {
             handleJwtException(response, 500, "Authentication Failed: " + ex.getMessage());
@@ -68,7 +68,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private void handleJwtException(HttpServletResponse response, int code, String message) throws IOException {
-        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        response.setStatus(code);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
         CommonResponse errorResponse = new CommonResponse(code, message);
