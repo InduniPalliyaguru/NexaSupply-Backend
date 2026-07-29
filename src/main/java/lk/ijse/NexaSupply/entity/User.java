@@ -1,6 +1,7 @@
 package lk.ijse.NexaSupply.entity;
 
 import jakarta.persistence.*;
+import lk.ijse.NexaSupply.enumeration.DataStatus;
 import lk.ijse.NexaSupply.enumeration.Role;
 import lk.ijse.NexaSupply.enumeration.Status;
 import lombok.AllArgsConstructor;
@@ -42,6 +43,9 @@ public class User {
     private Status status;
 
     private double creditLimit;
+
+    @Enumerated(EnumType.STRING)
+    private DataStatus dataStatus;
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Order> orderList;

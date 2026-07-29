@@ -1,6 +1,7 @@
 package lk.ijse.NexaSupply.entity;
 
 import jakarta.persistence.*;
+import lk.ijse.NexaSupply.enumeration.DataStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -30,6 +31,9 @@ public class Supplier {
     private String email;
 
     private String address;
+
+    @Enumerated(EnumType.STRING)
+    private DataStatus dataStatus;
 
     @OneToMany(mappedBy = "supplier", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<RestockHistory> restockHistoryList;

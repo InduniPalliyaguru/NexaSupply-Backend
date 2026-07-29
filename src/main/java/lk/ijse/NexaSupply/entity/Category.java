@@ -1,6 +1,7 @@
 package lk.ijse.NexaSupply.entity;
 
 import jakarta.persistence.*;
+import lk.ijse.NexaSupply.enumeration.DataStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,6 +24,9 @@ public class Category {
     @Column(nullable = false, unique = true)
     private String name;
     private String description;
+
+    @Enumerated(EnumType.STRING)
+    private DataStatus dataStatus;
 
     @OneToMany(mappedBy = "category",  cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Product> productList;
