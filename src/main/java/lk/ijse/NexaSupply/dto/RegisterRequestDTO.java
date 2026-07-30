@@ -33,4 +33,11 @@ public class RegisterRequestDTO {
 
     private double creditLimit;
 
+    public RegisterRequestDTO(String fullName, String email, String password, String phone, String address) {
+        this.fullName = fullName;
+        this.email = email;
+        this.password = password;
+        this.phone = phone;
+        this.address = address;
+    }
 }

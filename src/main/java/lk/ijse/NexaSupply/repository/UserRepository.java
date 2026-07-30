@@ -15,8 +15,6 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    User findByEmailAndDataStatus_Active(String email, DataStatus dataStatus);
-
     @Query("SELECT COUNT(u) > 0 FROM User u WHERE u.email = ?1 AND u.dataStatus = 'ACTIVE'")
     boolean existsActiveByEmail(String email);
 
