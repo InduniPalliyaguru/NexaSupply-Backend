@@ -1,6 +1,7 @@
 package lk.ijse.NexaSupply.service.impl;
 
 import lk.ijse.NexaSupply.dto.RegisterRequestDTO;
+import lk.ijse.NexaSupply.dto.UpdateProfileDTO;
 import lk.ijse.NexaSupply.dto.UserDTO;
 import lk.ijse.NexaSupply.dto.UserResponseDTO;
 import lk.ijse.NexaSupply.entity.User;
@@ -220,6 +221,27 @@ public class UserServiceImpl implements UserService {
         User user = optionalUser.get();
         user.setDataStatus(DataStatus.INACTIVE);
         userRepository.save(user);
+    }
+
+    @Override
+    public UserResponseDTO updateProfile(String email, UpdateProfileDTO request) {
+        log.info("Execute Update User method");
+
+        Optional<User> activeByEmail = userRepository.findActiveByEmail(email);
+        if (activeByEmail.isEmpty()) {
+            throw new CustomException(404, "User not found with email: " + email);
+        }
+        User user = activeByEmail.get();
+        user.setFullName(request.getFullName());
+        user.setPhone(request.getPhone());
+        user.setAddress(request.getAddress());
+
+        if (request.getShopName() != null && !request.getShopName().trim().isEmpty()) {
+            user.setShopName(request.getShopName());
+        }
+        User updateUser = userRepository.save(user);
+
+        return mapToUserResponse(updateUser);
     }
 
     private UserResponseDTO mapToUserResponse(User user) {

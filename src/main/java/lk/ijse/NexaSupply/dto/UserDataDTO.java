@@ -12,7 +12,7 @@ public class UserDataDTO {
 
     private long userId;
     private String userCode;
-    private Role role;
+    private String role;
     private String token;
 
 }

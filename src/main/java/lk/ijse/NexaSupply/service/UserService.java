@@ -1,6 +1,7 @@
 package lk.ijse.NexaSupply.service;
 
 import lk.ijse.NexaSupply.dto.RegisterRequestDTO;
+import lk.ijse.NexaSupply.dto.UpdateProfileDTO;
 import lk.ijse.NexaSupply.dto.UserDTO;
 import lk.ijse.NexaSupply.dto.UserResponseDTO;
 import lk.ijse.NexaSupply.enumeration.Role;
@@ -32,5 +33,7 @@ public interface UserService {
     List<UserResponseDTO> getUsersByEmail(String email);
 
     void deleteUser(String userCode);
+
+    UserResponseDTO updateProfile(String email, UpdateProfileDTO updateProfileDTO);
 
 }
