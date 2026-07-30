@@ -3,7 +3,7 @@ package lk.ijse.NexaSupply.entity;
 import jakarta.persistence.*;
 import lk.ijse.NexaSupply.enumeration.DataStatus;
 import lk.ijse.NexaSupply.enumeration.Role;
-import lk.ijse.NexaSupply.enumeration.Status;
+import lk.ijse.NexaSupply.enumeration.ProfileStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -40,7 +40,7 @@ public class User {
     private Role role;
 
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private ProfileStatus profileStatus;
 
     private double creditLimit;
 

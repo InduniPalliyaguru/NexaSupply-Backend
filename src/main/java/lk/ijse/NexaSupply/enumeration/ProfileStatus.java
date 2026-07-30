@@ -1,6 +1,6 @@
 package lk.ijse.NexaSupply.enumeration;
 
-public enum Status {
+public enum ProfileStatus {
 
     PENDING,
     APPROVED,
