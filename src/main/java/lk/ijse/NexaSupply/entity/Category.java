@@ -28,7 +28,7 @@ public class Category {
     @Enumerated(EnumType.STRING)
     private DataStatus dataStatus;
 
-    @OneToMany(mappedBy = "category",  cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Product> productList;
 
 }

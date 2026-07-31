@@ -2,6 +2,7 @@ package lk.ijse.NexaSupply.entity;
 
 import jakarta.persistence.*;
 import lk.ijse.NexaSupply.enumeration.DataStatus;
+import lk.ijse.NexaSupply.enumeration.Unit;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -30,10 +31,15 @@ public class Product {
     @Column(nullable = false)
     private int quantity;
 
+    @Enumerated(EnumType.STRING)
+    private Unit unit;
+
     private int minStockLevel;
 
     @Enumerated(EnumType.STRING)
     private DataStatus dataStatus;
+
+    private String imgUrl;
 
     @ManyToOne
     private Category category;
