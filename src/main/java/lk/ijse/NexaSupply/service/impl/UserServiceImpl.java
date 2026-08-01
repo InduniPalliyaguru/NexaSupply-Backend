@@ -10,7 +10,9 @@ import lk.ijse.NexaSupply.enumeration.ProfileStatus;
 import lk.ijse.NexaSupply.enumeration.Role;
 import lk.ijse.NexaSupply.exception.CustomException;
 import lk.ijse.NexaSupply.repository.UserRepository;
+import lk.ijse.NexaSupply.service.AuditLogService;
 import lk.ijse.NexaSupply.service.UserService;
+import lk.ijse.NexaSupply.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,6 +30,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuditLogService auditLogService;
 
     @Override
     public void registerRetailer(RegisterRequestDTO request) {
@@ -54,7 +57,10 @@ public class UserServiceImpl implements UserService {
         user.setCreditLimit(0.0);
         user.setDataStatus(DataStatus.ACTIVE);
 
-        userRepository.save(user);
+        User saved = userRepository.save(user);
+
+        String action = "USER_REGISTERED | Code: " + saved.getUserCode() + " | Role: RETAILER";
+        auditLogService.logAction(saved.getEmail(), action);
     }
 
     @Override
@@ -128,6 +134,9 @@ public class UserServiceImpl implements UserService {
         user.setCreditLimit(creditLimit);
 
         userRepository.save(user);
+
+        String action = "APPROVED_RETAILER | Code: " + userCode + " | Credit Limit: " + creditLimit;
+        auditLogService.logAction(SecurityUtils.getCurrentUserEmail(), action);
     }
 
     @Override
@@ -221,6 +230,9 @@ public class UserServiceImpl implements UserService {
         User user = optionalUser.get();
         user.setDataStatus(DataStatus.INACTIVE);
         userRepository.save(user);
+
+        String action = "DELETED_USER | Code: " + userCode + " | Email: " + user.getEmail();
+        auditLogService.logAction(SecurityUtils.getCurrentUserEmail(), action);
     }
 
     @Override

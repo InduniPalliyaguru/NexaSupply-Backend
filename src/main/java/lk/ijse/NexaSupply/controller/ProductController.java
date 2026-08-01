@@ -26,7 +26,7 @@ public class ProductController {
         return new CommonResponse(0, product, "Product created successfully");
     }
 
-    @PutMapping(value = "/{productCode}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public CommonResponse updateProduct(@Valid @RequestBody ProductRequestDTO requestDTO) {
         ProductResponseDTO dto = productService.updateProduct(requestDTO);

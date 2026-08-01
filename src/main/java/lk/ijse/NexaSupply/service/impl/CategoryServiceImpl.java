@@ -5,7 +5,9 @@ import lk.ijse.NexaSupply.entity.Category;
 import lk.ijse.NexaSupply.enumeration.DataStatus;
 import lk.ijse.NexaSupply.exception.CustomException;
 import lk.ijse.NexaSupply.repository.CategoryRepository;
+import lk.ijse.NexaSupply.service.AuditLogService;
 import lk.ijse.NexaSupply.service.CategoryService;
+import lk.ijse.NexaSupply.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,7 @@ import java.util.Optional;
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final AuditLogService auditLogService;
 
     @Override
     public CategoryDTO createCategory(CategoryDTO categoryDTO) {
@@ -39,6 +42,10 @@ public class CategoryServiceImpl implements CategoryService {
         category.setDataStatus(DataStatus.ACTIVE);
 
         Category saved = categoryRepository.save(category);
+
+        String action = "CREATED_CATEGORY | Code: " + saved.getCategoryCode() + " | Name: " + saved.getName();
+        auditLogService.logAction(SecurityUtils.getCurrentUserEmail(), action);
+
         return mapToDTO(saved);
     }
 
@@ -52,10 +59,16 @@ public class CategoryServiceImpl implements CategoryService {
         }
 
         Category category = optional.get();
+        String oldName = category.getName();
+
         category.setName(categoryDTO.getCategoryName());
         category.setDescription(categoryDTO.getDescription());
 
         Category updated = categoryRepository.save(category);
+
+        String action = "UPDATED_CATEGORY | Code: " + updated.getCategoryCode() + " | Old Name: " + oldName + " -> New Name: " + updated.getName();
+        auditLogService.logAction(SecurityUtils.getCurrentUserEmail(), action);
+
         return mapToDTO(updated);
     }
 
@@ -98,6 +111,9 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = optional.get();
         category.setDataStatus(DataStatus.INACTIVE);
         categoryRepository.save(category);
+
+        String action = "DELETED_CATEGORY | Code: " + category.getCategoryCode() + " | Name: " + category.getName();
+        auditLogService.logAction(SecurityUtils.getCurrentUserEmail(), action);
     }
 
     private CategoryDTO mapToDTO(Category category) {

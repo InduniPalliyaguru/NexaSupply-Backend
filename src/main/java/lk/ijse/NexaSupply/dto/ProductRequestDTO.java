@@ -19,20 +19,20 @@ public class ProductRequestDTO {
 
     private String productCode;
 
+    private String description;
+
     @NotNull(message = "Unit price is required")
     @Positive(message = "Unit price must be greater than zero")
-    private String description;
+    private double unitPrice;
 
     @NotNull(message = "Available quantity is required")
     @Min(value = 0, message = "Available quantity cannot be negative")
-    private double unitPrice;
-
-    @NotNull(message = "Unit type is required")
     private int availableQty;
 
-    @Min(value = 0, message = "Reorder level cannot be negative")
+    @NotNull(message = "Unit type is required")
     private Unit unit;
 
+    @Min(value = 0, message = "Reorder level cannot be negative")
     private int minStockLevel;
 
     private String imgUrl;

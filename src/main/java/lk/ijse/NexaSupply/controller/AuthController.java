@@ -6,6 +6,7 @@ import lk.ijse.NexaSupply.dto.RegisterRequestDTO;
 import lk.ijse.NexaSupply.dto.UserDTO;
 import lk.ijse.NexaSupply.dto.UserDataDTO;
 import lk.ijse.NexaSupply.security.JwtUtil;
+import lk.ijse.NexaSupply.service.AuditLogService;
 import lk.ijse.NexaSupply.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -23,6 +24,7 @@ public class AuthController {
 
     private final UserService userService;
     private final JwtUtil jwtUtil;
+    private final AuditLogService auditLogService;
 
     @PostMapping(value = "/register", produces = MediaType.APPLICATION_JSON_VALUE)
     public CommonResponse registerRetailer(@Valid @RequestBody RegisterRequestDTO request) {
@@ -46,6 +48,7 @@ public class AuthController {
         userDataDTO.setRole(userDetails.getRole().name());
         userDataDTO.setToken(token);
 
+        auditLogService.logAction(userDetails.getEmail(), "USER_LOGIN_SUCCESS");
         return new CommonResponse(0, userDataDTO, "Login successfully!");
     }
 

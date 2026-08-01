@@ -8,7 +8,9 @@ import lk.ijse.NexaSupply.enumeration.DataStatus;
 import lk.ijse.NexaSupply.exception.CustomException;
 import lk.ijse.NexaSupply.repository.CategoryRepository;
 import lk.ijse.NexaSupply.repository.ProductRepository;
+import lk.ijse.NexaSupply.service.AuditLogService;
 import lk.ijse.NexaSupply.service.ProductService;
+import lk.ijse.NexaSupply.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,7 @@ public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final AuditLogService auditLogService;
 
     @Override
     public ProductResponseDTO createProduct(ProductRequestDTO request) {
@@ -47,8 +50,12 @@ public class ProductServiceImpl implements ProductService {
         product.setImgUrl(request.getImgUrl());
         product.setCategory(category.get());
 
-        Product saved = productRepository.save(product);
-        return mapToResponseDTO(saved);
+        Product savedProduct = productRepository.save(product);
+
+        String action = "CREATED_PRODUCT | Code: " + savedProduct.getProductCode() + " | Name: " + savedProduct.getName() + " | Qty: " + savedProduct.getQuantity();
+        auditLogService.logAction(SecurityUtils.getCurrentUserEmail(), action);
+
+        return mapToResponseDTO(savedProduct);
     }
 
     @Override
@@ -66,6 +73,10 @@ public class ProductServiceImpl implements ProductService {
         }
 
         Product product = optionalProduct.get();
+
+        double oldPrice = product.getUnitPrice();
+        int oldQty = product.getQuantity();
+
         product.setName(request.getName());
         product.setUnitPrice(request.getUnitPrice());
         product.setQuantity(request.getAvailableQty());
@@ -74,8 +85,12 @@ public class ProductServiceImpl implements ProductService {
         product.setImgUrl(request.getImgUrl());
         product.setCategory(optionalCategory.get());
 
-        Product updated = productRepository.save(product);
-        return mapToResponseDTO(updated);
+        Product updatedProduct = productRepository.save(product);
+
+        String action = "UPDATED_PRODUCT | Code: " + product.getProductCode() + " | Price: [" + oldPrice + " -> " + updatedProduct.getUnitPrice() + "] | Stock: [" + oldQty + " -> " + updatedProduct.getQuantity() + "]";
+        auditLogService.logAction(SecurityUtils.getCurrentUserEmail(), action);
+
+        return mapToResponseDTO(updatedProduct);
     }
 
     @Override
@@ -158,6 +173,9 @@ public class ProductServiceImpl implements ProductService {
         Product product = optionalProduct.get();
         product.setDataStatus(DataStatus.INACTIVE);
         productRepository.save(product);
+
+        String action = "DELETED_PRODUCT | Code: " + productCode + " | Name: " + product.getName();
+        auditLogService.logAction(SecurityUtils.getCurrentUserEmail(), action);
     }
 
     private ProductResponseDTO mapToResponseDTO(Product product) {
