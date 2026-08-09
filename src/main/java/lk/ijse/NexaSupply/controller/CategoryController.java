@@ -22,32 +22,32 @@ public class CategoryController {
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public CommonResponse createCategory(@Valid @RequestBody CategoryDTO categoryDTO) {
         CategoryDTO category = categoryService.createCategory(categoryDTO);
-        return new CommonResponse(0, category, "Category created successfully");
+        return new CommonResponse(201, category, "Category created successfully");
     }
 
     @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public CommonResponse updateCategory(@Valid @RequestBody CategoryDTO categoryDTO) {
         CategoryDTO category = categoryService.updateCategory(categoryDTO);
-        return new CommonResponse(0, category, "Category updated successfully");
+        return new CommonResponse(200, category, "Category updated successfully");
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public CommonResponse getAllCategories() {
         List<CategoryDTO> allActiveCategories = categoryService.getAllActiveCategories();
-        return new CommonResponse(0, allActiveCategories, "Categories retrieved successfully");
+        return new CommonResponse(200, allActiveCategories, "Categories retrieved successfully");
     }
 
     @GetMapping(value = "/{code}", produces = MediaType.APPLICATION_JSON_VALUE)
     public CommonResponse getCategoryByCode(@PathVariable String code) {
         CategoryDTO categoryByCode = categoryService.getCategoryByCode(code);
-        return new CommonResponse(0, categoryByCode, "Category retrieved successfully");
+        return new CommonResponse(200, categoryByCode, "Category retrieved successfully");
     }
 
     @DeleteMapping(value = "/{code}", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public CommonResponse deleteCategory(@PathVariable String code) {
         categoryService.deleteCategory(code);
-        return new CommonResponse(0, "Category deleted successfully", "Success");
+        return new CommonResponse(200, "Category deleted successfully", "Success");
     }
 }

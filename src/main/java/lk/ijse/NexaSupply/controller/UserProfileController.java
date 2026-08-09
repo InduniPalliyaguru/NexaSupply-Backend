@@ -21,14 +21,14 @@ public class UserProfileController {
     public CommonResponse getUserProfile(Authentication authentication) {
         String email = authentication.getName();
         UserResponseDTO userProfile = userService.getUserProfile(email);
-        return new CommonResponse(0, userProfile, "User profile fetched successfully");
+        return new CommonResponse(200, userProfile, "User profile fetched successfully");
     }
 
     @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public CommonResponse updateProfile(Authentication authentication, @Valid @RequestBody UpdateProfileDTO update) {
         String email = authentication.getName();
         UserResponseDTO userProfile = userService.updateProfile(email, update);
-        return new CommonResponse(0, userProfile, "User profile updated successfully");
+        return new CommonResponse(200, userProfile, "User profile updated successfully");
     }
 
 }

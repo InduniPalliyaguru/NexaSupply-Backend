@@ -29,7 +29,7 @@ public class AuthController {
     @PostMapping(value = "/register", produces = MediaType.APPLICATION_JSON_VALUE)
     public CommonResponse registerRetailer(@Valid @RequestBody RegisterRequestDTO request) {
         userService.registerRetailer(request);
-        return new CommonResponse(0, "Retailer registered successfully", "Success");
+        return new CommonResponse(201, "Retailer registered successfully", "Success");
     }
 
     @PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -49,7 +49,7 @@ public class AuthController {
         userDataDTO.setToken(token);
 
         auditLogService.logAction(userDetails.getEmail(), "USER_LOGIN_SUCCESS");
-        return new CommonResponse(0, userDataDTO, "Login successfully!");
+        return new CommonResponse(200, userDataDTO, "Login successfully!");
     }
 
 }
