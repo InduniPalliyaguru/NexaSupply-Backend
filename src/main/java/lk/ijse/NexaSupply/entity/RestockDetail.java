@@ -5,23 +5,21 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class RestockHistory {
+public class RestockDetail {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long historyId;
+    private long restockDetailId;
+
+    @ManyToOne
+    private Restock restock;
 
     @ManyToOne
     private Product product;
-
-    @ManyToOne
-    private Supplier supplier;
 
     @Column(nullable = false)
     private int qtyAdded;
@@ -29,10 +27,6 @@ public class RestockHistory {
     @Column(nullable = false)
     private double purchaseUnitPrice;
 
-    private double totalCost;
-
-    private LocalDateTime restockDate;
-
-    private String invoiceNumber;
+    private double subTotal;
 
 }

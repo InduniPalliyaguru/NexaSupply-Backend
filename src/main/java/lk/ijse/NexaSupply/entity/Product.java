@@ -48,6 +48,6 @@ public class Product {
     private List<OrderProduct> orderProductList;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<RestockHistory> restockHistoryList;
+    private List<RestockDetail> restockDetails;
 
 }

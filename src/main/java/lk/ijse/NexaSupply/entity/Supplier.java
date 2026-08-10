@@ -36,6 +36,6 @@ public class Supplier {
     private DataStatus dataStatus;
 
     @OneToMany(mappedBy = "supplier", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<RestockHistory> restockHistoryList;
+    private List<Restock> restockList;
 
 }
