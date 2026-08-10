@@ -25,7 +25,7 @@ public class Restock {
 
     private LocalDateTime restockDate;
 
-    private double totalCose;
+    private double totalCost;
 
     @ManyToOne
     private Supplier supplier;
