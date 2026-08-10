@@ -25,4 +25,20 @@ public class SupplierDTO {
 
     private String address;
 
+    public SupplierDTO(String supplierCode, String companyName, String contactPerson, String phone, String email, String address) {
+        this.supplierCode = supplierCode;
+        this.companyName = companyName;
+        this.contactPerson = contactPerson;
+        this.phone = phone;
+        this.email = email;
+        this.address = address;
+    }
+
+    public SupplierDTO(String companyName, String contactPerson, String phone, String email, String address) {
+        this.companyName = companyName;
+        this.contactPerson = contactPerson;
+        this.phone = phone;
+        this.email = email;
+        this.address = address;
+    }
 }

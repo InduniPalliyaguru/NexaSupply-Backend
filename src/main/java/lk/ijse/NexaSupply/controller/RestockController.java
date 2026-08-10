@@ -21,14 +21,14 @@ public class RestockController {
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    private CommonResponse addRestock(@Valid @RequestBody RestockRequestDTO dto) {
+    public CommonResponse addRestock(@Valid @RequestBody RestockRequestDTO dto) {
         RestockResponseDTO response = restockService.addRestock(dto);
         return new CommonResponse(201, response, "Restock added successfully!");
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    private CommonResponse getAllRestockHistory() {
+    public CommonResponse getAllRestockHistory() {
         List<RestockResponseDTO> response = restockService.getAllRestockHistory();
         return new CommonResponse(200, response, "Restock History retrieved successfully!");
     }
