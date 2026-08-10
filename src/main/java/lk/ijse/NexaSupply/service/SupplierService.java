@@ -14,4 +14,8 @@ public interface SupplierService {
 
     List<SupplierDTO> getAllActiveSuppliers();
 
+    SupplierDTO getSupplierByCode(String supplierCode);
+
+    List<SupplierDTO> searchSuppliers(String query);
+
 }

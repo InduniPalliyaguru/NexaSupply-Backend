@@ -19,4 +19,7 @@ public interface SupplierRepository extends JpaRepository<Supplier, Long> {
     @Query("SELECT COUNT(s) FROM Supplier s")
     long countAllSuppliers();
 
+    @Query("SELECT s FROM Supplier s WHERE (LOWER(s.companyName) LIKE LOWER(CONCAT('%', ?1, '%')) OR LOWER(s.contactPerson) LIKE LOWER(CONCAT('%', ?1, '%')) OR LOWER(s.supplierCode) LIKE LOWER(CONCAT('%', ?1, '%'))) AND s.dataStatus = 'ACTIVE'")
+    List<Supplier> searchSuppliers(String query);
+
 }

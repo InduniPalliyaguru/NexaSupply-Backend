@@ -100,6 +100,31 @@ public class SupplierServiceImpl implements SupplierService {
         return dtoList;
     }
 
+    @Override
+    public SupplierDTO getSupplierByCode(String supplierCode) {
+        log.info("Execute getSupplierByCode method");
+
+        Optional<Supplier> supplierOptional = supplierRepository.findBySupplierCodeAndDataStatus(supplierCode, DataStatus.ACTIVE);
+        if (supplierOptional.isEmpty()) {
+            throw new CustomException(404, "Supplier Not Found with Code: " + supplierCode);
+        }
+        Supplier supplier = supplierOptional.get();
+        return mapToDTO(supplier);
+    }
+
+    @Override
+    public List<SupplierDTO> searchSuppliers(String query) {
+        log.info("Execute searchSuppliers method");
+
+        List<Supplier> suppliers = supplierRepository.searchSuppliers(query);
+        List<SupplierDTO> dtoList = new ArrayList<>();
+        for (Supplier supplier : suppliers) {
+            SupplierDTO mapped = mapToDTO(supplier);
+            dtoList.add(mapped);
+        }
+        return dtoList;
+    }
+
     private String generateSupplierCode() {
         int year = Year.now().getValue();
         long count = supplierRepository.countAllSuppliers() + 1;
@@ -117,5 +142,6 @@ public class SupplierServiceImpl implements SupplierService {
                 supplier.getAddress()
         );
     }
+
 
 }
