@@ -1,6 +1,7 @@
 package lk.ijse.NexaSupply.entity;
 
 import jakarta.persistence.*;
+import lk.ijse.NexaSupply.enumeration.PaymentStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,10 +22,15 @@ public class Payment {
     private String paymentCode;
 
     @Column(nullable = false)
-    private Double amount;
+    private Double totalAmount;
 
+    private double paidAmount = 0.0;
+
+    private double balanceAmount;
+
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String paymentStatus = "PENDING";
+    private PaymentStatus paymentStatus = PaymentStatus.PENDING;
 
     private LocalDateTime paymentDate = LocalDateTime.now();
 

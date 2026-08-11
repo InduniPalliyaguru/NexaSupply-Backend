@@ -12,6 +12,8 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
     Optional<Payment> findByPaymentCode(String paymentCode);
 
+    Optional<Payment> findByOrder_OrderCode(String orderCode);
+
     @Query("SELECT COUNT(p) FROM Payment p")
     long countAllPayments();
 

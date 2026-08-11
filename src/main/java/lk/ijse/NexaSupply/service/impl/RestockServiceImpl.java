@@ -20,6 +20,7 @@ import lk.ijse.NexaSupply.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -31,7 +32,6 @@ import java.util.Optional;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-@Transactional
 public class RestockServiceImpl implements RestockService {
 
     private final RestockRepository restockRepository;
@@ -41,6 +41,7 @@ public class RestockServiceImpl implements RestockService {
     private final AuditLogService auditLogService;
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public RestockResponseDTO addRestock(RestockRequestDTO dto) {
         log.info("Execute addRestock method");
 

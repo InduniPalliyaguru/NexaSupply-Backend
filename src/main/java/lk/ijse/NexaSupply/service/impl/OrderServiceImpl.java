@@ -7,15 +7,17 @@ import lk.ijse.NexaSupply.entity.*;
 import lk.ijse.NexaSupply.enumeration.OrderStatus;
 import lk.ijse.NexaSupply.exception.CustomException;
 import lk.ijse.NexaSupply.repository.OrderRepository;
-import lk.ijse.NexaSupply.repository.PaymentRepository;
 import lk.ijse.NexaSupply.repository.ProductRepository;
 import lk.ijse.NexaSupply.repository.UserRepository;
 import lk.ijse.NexaSupply.service.AuditLogService;
 import lk.ijse.NexaSupply.service.OrderService;
+import lk.ijse.NexaSupply.service.PaymentService;
 import lk.ijse.NexaSupply.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.Year;
@@ -31,10 +33,11 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
-    private final PaymentRepository paymentRepository;
     private final AuditLogService auditLogService;
+    private final PaymentService paymentService;
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public OrderResponseDTO placeOrder(OrderRequestDTO requestDTO) {
         log.info("Execute Place Order Method");
 
@@ -103,6 +106,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public OrderResponseDTO updateOrderStatus(String orderCode, OrderStatus status) {
         log.info("Execute Update Order Status Method");
 
@@ -113,13 +117,7 @@ public class OrderServiceImpl implements OrderService {
         Order order = optionalOrder.get();
 
         if (status == OrderStatus.APPROVED && order.getOrderStatus() == OrderStatus.PENDING) {
-            Payment payment = new Payment();
-            payment.setPaymentCode(generatePaymentCode());
-            payment.setAmount(order.getTotalPrice());
-            payment.setPaymentStatus("PENDING");
-            payment.setOrder(order);
-
-            paymentRepository.save(payment);
+            paymentService.createPendingPaymentForOrder(order);
         }
 
         if (status == OrderStatus.CANCELLED && order.getOrderStatus() != OrderStatus.CANCELLED) {
@@ -191,12 +189,6 @@ public class OrderServiceImpl implements OrderService {
         int year = Year.now().getValue();
         long count = orderRepository.countAllOrders() + 1;
         return String.format("ORD-%d-%04d", year, count);
-    }
-
-    private String generatePaymentCode() {
-        int year = Year.now().getValue();
-        long count = paymentRepository.countAllPayments() + 1;
-        return String.format("PAY-%d-%04d", year, count);
     }
 
     private OrderResponseDTO mapToResponseDTO(Order order) {
