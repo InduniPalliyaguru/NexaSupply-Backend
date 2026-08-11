@@ -1,16 +1,15 @@
 package lk.ijse.NexaSupply.service.impl;
 
-import lk.ijse.NexaSupply.dto.RegisterRequestDTO;
-import lk.ijse.NexaSupply.dto.UpdateProfileDTO;
-import lk.ijse.NexaSupply.dto.UserDTO;
-import lk.ijse.NexaSupply.dto.UserResponseDTO;
+import lk.ijse.NexaSupply.dto.*;
 import lk.ijse.NexaSupply.entity.User;
 import lk.ijse.NexaSupply.enumeration.DataStatus;
+import lk.ijse.NexaSupply.enumeration.LedgerType;
 import lk.ijse.NexaSupply.enumeration.ProfileStatus;
 import lk.ijse.NexaSupply.enumeration.Role;
 import lk.ijse.NexaSupply.exception.CustomException;
 import lk.ijse.NexaSupply.repository.UserRepository;
 import lk.ijse.NexaSupply.service.AuditLogService;
+import lk.ijse.NexaSupply.service.CreditLedgerService;
 import lk.ijse.NexaSupply.service.UserService;
 import lk.ijse.NexaSupply.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +32,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuditLogService auditLogService;
+    private final CreditLedgerService creditLedgerService;
 
     @Override
     public void registerRetailer(RegisterRequestDTO request) {
@@ -136,6 +136,16 @@ public class UserServiceImpl implements UserService {
         user.setCreditLimit(creditLimit);
 
         userRepository.save(user);
+
+        CreditLedgerDTO ledger = new CreditLedgerDTO();
+        ledger.setReferenceCode("SYS-ADMIN");
+        ledger.setAmount(creditLimit);
+        ledger.setBalanceAfter(creditLimit);
+        ledger.setLedgerType(LedgerType.ADMIN_ADJUSTMENT);
+        ledger.setDescription("Initial credit limit allocated upon account approval");
+        ledger.setUserCode(userCode);
+
+        creditLedgerService.recordLedger(ledger);
 
         String action = "APPROVED_RETAILER | Code: " + userCode + " | Credit Limit: " + creditLimit;
         auditLogService.logAction(SecurityUtils.getCurrentUserEmail(), action);

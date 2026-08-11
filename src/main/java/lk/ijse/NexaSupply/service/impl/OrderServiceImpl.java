@@ -1,15 +1,18 @@
 package lk.ijse.NexaSupply.service.impl;
 
+import lk.ijse.NexaSupply.dto.CreditLedgerDTO;
 import lk.ijse.NexaSupply.dto.OrderProductDTO;
 import lk.ijse.NexaSupply.dto.OrderRequestDTO;
 import lk.ijse.NexaSupply.dto.OrderResponseDTO;
 import lk.ijse.NexaSupply.entity.*;
+import lk.ijse.NexaSupply.enumeration.LedgerType;
 import lk.ijse.NexaSupply.enumeration.OrderStatus;
 import lk.ijse.NexaSupply.exception.CustomException;
 import lk.ijse.NexaSupply.repository.OrderRepository;
 import lk.ijse.NexaSupply.repository.ProductRepository;
 import lk.ijse.NexaSupply.repository.UserRepository;
 import lk.ijse.NexaSupply.service.AuditLogService;
+import lk.ijse.NexaSupply.service.CreditLedgerService;
 import lk.ijse.NexaSupply.service.OrderService;
 import lk.ijse.NexaSupply.service.PaymentService;
 import lk.ijse.NexaSupply.util.SecurityUtils;
@@ -35,6 +38,7 @@ public class OrderServiceImpl implements OrderService {
     private final UserRepository userRepository;
     private final AuditLogService auditLogService;
     private final PaymentService paymentService;
+    private final CreditLedgerService creditLedgerService;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -92,13 +96,24 @@ public class OrderServiceImpl implements OrderService {
             throw new CustomException(400, "Insufficient credit limit! Available credit limit: " + customer.getCreditLimit());
         }
 
-        customer.setCreditLimit(customer.getCreditLimit() - calculatedTotal);
+        double newCreditBalance = customer.getCreditLimit() - calculatedTotal;
+        customer.setCreditLimit(newCreditBalance);
         userRepository.save(customer);
 
         order.setTotalPrice(calculatedTotal);
         order.setOrderProductList(orderProductList);
 
         Order savedOrder = orderRepository.save(order);
+
+        CreditLedgerDTO ledgerDTO = new CreditLedgerDTO();
+        ledgerDTO.setReferenceCode(savedOrder.getOrderCode());
+        ledgerDTO.setAmount(calculatedTotal);
+        ledgerDTO.setBalanceAfter(newCreditBalance);
+        ledgerDTO.setLedgerType(LedgerType.ORDER_DEDUCTION);
+        ledgerDTO.setDescription("Credit deducted for placing order: " + savedOrder.getOrderCode());
+        ledgerDTO.setUserCode(customer.getUserCode());
+
+        creditLedgerService.recordLedger(ledgerDTO);
 
         auditLogService.logAction(currentUserEmail, "PLACED_ORDER | Code: " + savedOrder.getOrderCode() + " | Total: " + savedOrder.getTotalPrice());
 
@@ -126,6 +141,16 @@ public class OrderServiceImpl implements OrderService {
             double restoreCredit = customer.getCreditLimit() + order.getTotalPrice();
             customer.setCreditLimit(restoreCredit);
             userRepository.save(customer);
+
+            CreditLedgerDTO ledgerDTO = new CreditLedgerDTO();
+            ledgerDTO.setReferenceCode(order.getOrderCode());
+            ledgerDTO.setAmount(order.getTotalPrice());
+            ledgerDTO.setBalanceAfter(restoreCredit);
+            ledgerDTO.setLedgerType(LedgerType.ORDER_CANCEL_REFUND);
+            ledgerDTO.setDescription("Credit restored for cancelled order: " + orderCode);
+            ledgerDTO.setUserCode(customer.getUserCode());
+
+            creditLedgerService.recordLedger(ledgerDTO);
 
             List<OrderProduct> orderProductList = order.getOrderProductList();
 

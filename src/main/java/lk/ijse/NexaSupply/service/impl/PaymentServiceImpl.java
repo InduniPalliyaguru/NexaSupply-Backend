@@ -1,14 +1,17 @@
 package lk.ijse.NexaSupply.service.impl;
 
+import lk.ijse.NexaSupply.dto.CreditLedgerDTO;
 import lk.ijse.NexaSupply.dto.PaymentDTO;
 import lk.ijse.NexaSupply.dto.PaymentProcessDTO;
 import lk.ijse.NexaSupply.entity.Order;
 import lk.ijse.NexaSupply.entity.Payment;
 import lk.ijse.NexaSupply.entity.User;
+import lk.ijse.NexaSupply.enumeration.LedgerType;
 import lk.ijse.NexaSupply.enumeration.PaymentStatus;
 import lk.ijse.NexaSupply.exception.CustomException;
 import lk.ijse.NexaSupply.repository.PaymentRepository;
 import lk.ijse.NexaSupply.repository.UserRepository;
+import lk.ijse.NexaSupply.service.CreditLedgerService;
 import lk.ijse.NexaSupply.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +32,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final UserRepository userRepository;
+    private final CreditLedgerService creditLedgerService;
 
     @Override
     public void createPendingPaymentForOrder(Order order) {
@@ -84,6 +88,17 @@ public class PaymentServiceImpl implements PaymentService {
         userRepository.save(customer);
 
         Payment savedPayment = paymentRepository.save(payment);
+
+        CreditLedgerDTO ledgerDTO = new CreditLedgerDTO();
+        ledgerDTO.setReferenceCode(payment.getPaymentCode());
+        ledgerDTO.setAmount(dto.getPayingAmount());
+        ledgerDTO.setBalanceAfter(newCreditLimit);
+        ledgerDTO.setLedgerType(LedgerType.PAYMENT_RESTORATION);
+        ledgerDTO.setDescription("Credit limit recovered via payment: " + payment.getPaymentCode());
+        ledgerDTO.setUserCode(customer.getUserCode());
+
+        creditLedgerService.recordLedger(ledgerDTO);
+
         return mapToDTO(savedPayment);
     }
 
