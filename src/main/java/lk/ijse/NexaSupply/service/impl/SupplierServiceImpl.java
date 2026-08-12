@@ -24,8 +24,8 @@ import java.util.Optional;
 @Transactional
 public class SupplierServiceImpl implements SupplierService {
 
-    public final SupplierRepository supplierRepository;
-    public final AuditLogService auditLogService;
+    private final SupplierRepository supplierRepository;
+    private final AuditLogService auditLogService;
 
     @Override
     public SupplierDTO createSupplier(SupplierDTO dto) {
