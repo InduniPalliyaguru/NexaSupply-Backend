@@ -97,7 +97,7 @@ public class UserServiceImpl implements UserService {
         Optional<User> activeByEmail = userRepository.findActiveByEmail(email);
 
         if (activeByEmail.isEmpty()) {
-            throw new CustomException(404, "Invalid email!");
+            throw new CustomException(404, "User Not found with email: " + email);
         }
 
         User user = activeByEmail.get();
