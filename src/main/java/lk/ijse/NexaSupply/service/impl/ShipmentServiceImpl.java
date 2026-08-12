@@ -6,6 +6,7 @@ import lk.ijse.NexaSupply.entity.Driver;
 import lk.ijse.NexaSupply.entity.Order;
 import lk.ijse.NexaSupply.entity.Shipment;
 import lk.ijse.NexaSupply.enumeration.DataStatus;
+import lk.ijse.NexaSupply.enumeration.DriverStatus;
 import lk.ijse.NexaSupply.enumeration.OrderStatus;
 import lk.ijse.NexaSupply.enumeration.ShipmentStatus;
 import lk.ijse.NexaSupply.exception.CustomException;
@@ -83,12 +84,20 @@ public class ShipmentServiceImpl implements ShipmentService {
         shipment.setStatus(status);
 
         Order order = shipment.getOrder();
-        if (order != null) {
+        Driver driver = shipment.getDriver();
+        if (order != null && driver != null) {
             if (status == ShipmentStatus.DISPATCHED) {
                 shipment.setDispatchedDate(LocalDateTime.now());
                 order.setOrderStatus(OrderStatus.DISPATCHED);
-            } else if (status == ShipmentStatus.IN_TRANSIT || status == ShipmentStatus.DELIVERED) {
+                driver.setDriverStatus(DriverStatus.ON_TRIP);
+
+            } else if (status == ShipmentStatus.IN_TRANSIT) {
                 order.setOrderStatus(OrderStatus.DISPATCHED);
+
+            } else if (status == ShipmentStatus.DELIVERED) {
+                order.setOrderStatus(OrderStatus.DISPATCHED);
+                driver.setDriverStatus(DriverStatus.AVAILABLE);
+
             } else if (status == ShipmentStatus.CANCELLED) {
                 order.setOrderStatus(OrderStatus.APPROVED);
             }
