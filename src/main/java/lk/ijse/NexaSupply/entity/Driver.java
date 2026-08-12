@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -36,5 +38,8 @@ public class Driver {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private DataStatus dataStatus;
+
+    @OneToMany(mappedBy = "driver", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Shipment> shipments;
 
 }
