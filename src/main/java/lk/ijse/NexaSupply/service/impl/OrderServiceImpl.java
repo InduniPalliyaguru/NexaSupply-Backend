@@ -5,8 +5,10 @@ import lk.ijse.NexaSupply.dto.OrderProductDTO;
 import lk.ijse.NexaSupply.dto.OrderRequestDTO;
 import lk.ijse.NexaSupply.dto.OrderResponseDTO;
 import lk.ijse.NexaSupply.entity.*;
+import lk.ijse.NexaSupply.enumeration.DataStatus;
 import lk.ijse.NexaSupply.enumeration.LedgerType;
 import lk.ijse.NexaSupply.enumeration.OrderStatus;
+import lk.ijse.NexaSupply.enumeration.Role;
 import lk.ijse.NexaSupply.exception.CustomException;
 import lk.ijse.NexaSupply.repository.OrderRepository;
 import lk.ijse.NexaSupply.repository.ProductRepository;
@@ -118,6 +120,15 @@ public class OrderServiceImpl implements OrderService {
                 "Order Placed Successfully",
                 "Your order " + savedOrder.getOrderCode() + " for LKR " + savedOrder.getTotalPrice() + " has been placed successfully."
         );
+
+        List<User> adminList = userRepository.findByRoleAndDataStatus(Role.ROLE_ADMIN, DataStatus.ACTIVE);
+        for (User admin : adminList) {
+            notificationService.createNotification(
+                    admin,
+                    "New Order Received!",
+                    "New order " + savedOrder.getOrderCode() + " placed by " + customer.getFullName() + " for LKR " + savedOrder.getTotalPrice() + "."
+            );
+        }
 
         auditLogService.logAction(currentUserEmail, "PLACED_ORDER | Code: " + savedOrder.getOrderCode() + " | Total: " + savedOrder.getTotalPrice());
 

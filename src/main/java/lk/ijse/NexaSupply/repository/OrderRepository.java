@@ -1,6 +1,8 @@
 package lk.ijse.NexaSupply.repository;
 
+import lk.ijse.NexaSupply.dto.MonthlySalesDTO;
 import lk.ijse.NexaSupply.entity.Order;
+import lk.ijse.NexaSupply.enumeration.OrderStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -20,5 +22,19 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Query("SELECT COUNT(o) FROM Order o")
     long countAllOrders();
+
+    long countByOrderStatus(OrderStatus orderStatus);
+
+    @Query("SELECT COALESCE(SUM(o.totalPrice), 0.0) FROM Order o WHERE o.orderStatus != 'CANCELLED'")
+    double sumTotalRevenue();
+
+    @Query("SELECT new lk.ijse.NexaSupply.dto.MonthlySalesDTO(" +
+            "FUNCTION('DATE_FORMAT', o.orderDate, '%Y-%b'), " +
+            "COALESCE(SUM(o.totalPrice), 0.0)) " +
+            "FROM Order o " +
+            "WHERE o.orderStatus != ?1 " +
+            "GROUP BY YEAR(o.orderDate), MONTH(o.orderDate), FUNCTION('DATE_FORMAT', o.orderDate, '%Y-%b') " +
+            "ORDER BY YEAR(o.orderDate) ASC, MONTH(o.orderDate) ASC")
+    List<MonthlySalesDTO> findMonthlySalesRaw(OrderStatus orderStatus);
 
 }

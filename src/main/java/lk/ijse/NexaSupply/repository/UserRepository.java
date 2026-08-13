@@ -37,4 +37,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     List<User> findByEmailContainingIgnoreCaseAndDataStatus(String email, DataStatus dataStatus);
 
+    long countByRoleAndDataStatus(Role role, DataStatus dataStatus);
+
 }

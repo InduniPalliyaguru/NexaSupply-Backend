@@ -29,4 +29,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("SELECT p FROM Product p WHERE (LOWER(p.name) LIKE LOWER(CONCAT('%', ?1, '%')) OR LOWER(p.productCode) LIKE LOWER(CONCAT('%', ?1, '%'))) AND p.dataStatus = 'ACTIVE'")
     List<Product> searchActiveProducts(String query);
 
+    @Query("SELECT COUNT(p) FROM Product p WHERE p.quantity <= p.minStockLevel AND p.dataStatus = 'ACTIVE'")
+    long countLowStockProducts();
+
 }
