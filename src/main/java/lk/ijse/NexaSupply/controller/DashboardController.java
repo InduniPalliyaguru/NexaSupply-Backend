@@ -2,6 +2,7 @@ package lk.ijse.NexaSupply.controller;
 
 import lk.ijse.NexaSupply.constant.CommonResponse;
 import lk.ijse.NexaSupply.dto.AdminDashboardDTO;
+import lk.ijse.NexaSupply.dto.RetailerDashboardDTO;
 import lk.ijse.NexaSupply.service.DashboardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -22,6 +23,13 @@ public class DashboardController {
     public CommonResponse getAdminDashboardData() {
         AdminDashboardDTO adminDashboardData = dashboardService.getAdminDashboardData();
         return new CommonResponse(200, adminDashboardData, "Admin dashboard data fetched successfully!");
+    }
+
+    @GetMapping(value = "/retailer", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAuthority('ROLE_RETAILER')")
+    public CommonResponse getRetailerDashboardData() {
+        RetailerDashboardDTO retailerDashboardData = dashboardService.getRetailerDashboardData();
+        return new CommonResponse(200, retailerDashboardData, "Retailer dashboard data fetched successfully!");
     }
 
 }

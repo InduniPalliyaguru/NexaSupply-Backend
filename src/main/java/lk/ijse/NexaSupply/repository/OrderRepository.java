@@ -37,4 +37,17 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             "ORDER BY YEAR(o.orderDate) ASC, MONTH(o.orderDate) ASC")
     List<MonthlySalesDTO> findMonthlySalesRaw(OrderStatus orderStatus);
 
+    long countByCustomer_EmailAndOrderStatus(String email, OrderStatus orderStatus);
+
+    long countByCustomer_Email(String email);
+
+    @Query("SELECT COALESCE(SUM(o.totalPrice), 0.0) FROM Order o WHERE o.customer.email = ?1 AND o.orderStatus != ?2")
+    double sumTotalSpentByCustomer(String email, OrderStatus orderStatus);
+
+    @Query(value = "SELECT o.* FROM orders o " +
+            "INNER JOIN user u ON o.customer_user_id = u.user_id " +
+            "WHERE u.email = ?1 " +
+            "ORDER BY o.order_date DESC LIMIT 5", nativeQuery = true)
+    List<Order> findRecentOrders(String email);
+
 }
