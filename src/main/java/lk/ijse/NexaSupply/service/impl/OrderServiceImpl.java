@@ -11,10 +11,7 @@ import lk.ijse.NexaSupply.exception.CustomException;
 import lk.ijse.NexaSupply.repository.OrderRepository;
 import lk.ijse.NexaSupply.repository.ProductRepository;
 import lk.ijse.NexaSupply.repository.UserRepository;
-import lk.ijse.NexaSupply.service.AuditLogService;
-import lk.ijse.NexaSupply.service.CreditLedgerService;
-import lk.ijse.NexaSupply.service.OrderService;
-import lk.ijse.NexaSupply.service.PaymentService;
+import lk.ijse.NexaSupply.service.*;
 import lk.ijse.NexaSupply.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +36,7 @@ public class OrderServiceImpl implements OrderService {
     private final AuditLogService auditLogService;
     private final PaymentService paymentService;
     private final CreditLedgerService creditLedgerService;
+    private final NotificationService notificationService;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -115,6 +113,12 @@ public class OrderServiceImpl implements OrderService {
 
         creditLedgerService.recordLedger(ledgerDTO);
 
+        notificationService.createNotification(
+                customer,
+                "Order Placed Successfully",
+                "Your order " + savedOrder.getOrderCode() + " for LKR " + savedOrder.getTotalPrice() + " has been placed successfully."
+        );
+
         auditLogService.logAction(currentUserEmail, "PLACED_ORDER | Code: " + savedOrder.getOrderCode() + " | Total: " + savedOrder.getTotalPrice());
 
         return mapToResponseDTO(savedOrder);
@@ -163,6 +167,14 @@ public class OrderServiceImpl implements OrderService {
 
         order.setOrderStatus(status);
         Order savedOrder = orderRepository.save(order);
+
+        if (savedOrder.getCustomer() != null) {
+            notificationService.createNotification(
+                    savedOrder.getCustomer(),
+                    "Order Status Updated",
+                    "Your order " + orderCode + " status has been updated to " + status + "."
+            );
+        }
 
         auditLogService.logAction(SecurityUtils.getCurrentUserEmail(), "UPDATED_ORDER_STATUS | Code: " + orderCode + " | Status: " + status);
 

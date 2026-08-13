@@ -14,6 +14,7 @@ import lk.ijse.NexaSupply.repository.DriverRepository;
 import lk.ijse.NexaSupply.repository.OrderRepository;
 import lk.ijse.NexaSupply.repository.ShipmentRepository;
 import lk.ijse.NexaSupply.service.AuditLogService;
+import lk.ijse.NexaSupply.service.NotificationService;
 import lk.ijse.NexaSupply.service.ShipmentService;
 import lk.ijse.NexaSupply.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +38,7 @@ public class ShipmentServiceImpl implements ShipmentService {
     private final OrderRepository orderRepository;
     private final DriverRepository driverRepository;
     private final AuditLogService auditLogService;
+    private final NotificationService notificationService;
 
     @Override
     public ShipmentResponseDTO createShipment(ShipmentRequestDTO dto) {
@@ -65,6 +67,14 @@ public class ShipmentServiceImpl implements ShipmentService {
         shipment.setDriver(driverOptional.get());
 
         Shipment saved = shipmentRepository.save(shipment);
+
+        if (saved.getOrder() != null && saved.getOrder().getCustomer() != null) {
+            notificationService.createNotification(
+                    saved.getOrder().getCustomer(),
+                    "Shipment Created",
+                    "Shipment " + saved.getTrackingNumber() + " has been created for your order " + saved.getOrder().getOrderCode() + "."
+            );
+        }
 
         auditLogService.logAction(SecurityUtils.getCurrentUserEmail(), "CREATED_SHIPMENT | Tracking: " + saved.getTrackingNumber() + " | Order: " + saved.getOrder().getOrderCode());
 
@@ -104,6 +114,14 @@ public class ShipmentServiceImpl implements ShipmentService {
             orderRepository.save(order);
         }
         Shipment updated = shipmentRepository.save(shipment);
+
+        if (shipment.getOrder() != null && shipment.getOrder().getCustomer() != null) {
+            notificationService.createNotification(
+                    shipment.getOrder().getCustomer(),
+                    "Shipment Status Updated",
+                    "Your shipment " + trackingNumber + " status is now " + status + "."
+            );
+        }
 
         auditLogService.logAction(SecurityUtils.getCurrentUserEmail(), "UPDATED_SHIPMENT_STATUS | Tracking: " + trackingNumber + " | Status: " + status);
         return mapToDTO(updated);

@@ -12,6 +12,7 @@ import lk.ijse.NexaSupply.exception.CustomException;
 import lk.ijse.NexaSupply.repository.PaymentRepository;
 import lk.ijse.NexaSupply.repository.UserRepository;
 import lk.ijse.NexaSupply.service.CreditLedgerService;
+import lk.ijse.NexaSupply.service.NotificationService;
 import lk.ijse.NexaSupply.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +34,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
     private final UserRepository userRepository;
     private final CreditLedgerService creditLedgerService;
+    private final NotificationService notificationService;
 
     @Override
     public void createPendingPaymentForOrder(Order order) {
@@ -98,6 +100,12 @@ public class PaymentServiceImpl implements PaymentService {
         ledgerDTO.setUserCode(customer.getUserCode());
 
         creditLedgerService.recordLedger(ledgerDTO);
+
+        notificationService.createNotification(
+                customer,
+                "Payment Received",
+                "Payment of LKR " + dto.getPayingAmount() + " processed for order " + payment.getOrder().getOrderCode() + ". Remaining balance: LKR " + newBalanceAmount + "."
+        );
 
         return mapToDTO(savedPayment);
     }
