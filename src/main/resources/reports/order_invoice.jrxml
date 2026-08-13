@@ -1,0 +1,221 @@
+<!-- Created with Jaspersoft Studio version 7.0.3.final using JasperReports Library version 7.0.3-41034ca841d452f3305ba55b9042260aaa1ab5dd  -->
+<jasperReport name="OrderInvoice" language="java" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="30"
+              rightMargin="30" topMargin="30" bottomMargin="30">
+    <parameter name="logoPath" class="java.lang.String"/>
+    <parameter name="orderCode" class="java.lang.String"/>
+    <parameter name="orderDate" class="java.lang.String"/>
+    <parameter name="orderStatus" class="java.lang.String"/>
+    <parameter name="customerName" class="java.lang.String"/>
+    <parameter name="shopName" class="java.lang.String"/>
+    <parameter name="customerEmail" class="java.lang.String"/>
+    <parameter name="customerPhone" class="java.lang.String"/>
+    <parameter name="payCode" class="java.lang.String"/>
+    <parameter name="paymentStatus" class="java.lang.String"/>
+    <parameter name="grandTotal" class="java.lang.Double"/>
+    <parameter name="paidAmount" class="java.lang.Double"/>
+    <parameter name="balanceAmount" class="java.lang.Double"/>
+    <field name="productName" class="java.lang.String"/>
+    <field name="unitPrice" class="java.lang.Double"/>
+    <field name="quantity" class="java.lang.Integer"/>
+    <field name="subTotal" class="java.lang.Double"/>
+    <background splitType="Stretch"/>
+    <title height="110" splitType="Stretch">
+        <element kind="rectangle" uuid="a123bc89-1111-2222-3333-444455556666" x="0" y="0" width="535" height="6"
+                 backcolor="#2A0033">
+            <pen lineWidth="0.0"/>
+        </element>
+        <element kind="image" uuid="b234cd90-2222-3333-4444-555566667777" x="0" y="20" width="60" height="60"
+                 onErrorType="Blank">
+            <expression><![CDATA[$P{logoPath}]]></expression>
+        </element>
+        <element kind="staticText" uuid="c345de01-3333-4444-5555-666677778888" x="70" y="20" width="200" height="25"
+                 forecolor="#1E0024" fontName="SansSerif" fontSize="18.0" bold="true" hTextAlign="Left"
+                 vTextAlign="Middle">
+            <text><![CDATA[NexaSupply]]></text>
+        </element>
+        <element kind="staticText" uuid="d456ef12-4444-5555-6666-777788889999" x="70" y="45" width="200" height="15"
+                 forecolor="#7F0099" fontName="SansSerif" fontSize="9.0" bold="false" hTextAlign="Left"
+                 vTextAlign="Middle">
+            <text><![CDATA[Supply Chain & Distribution System]]></text>
+        </element>
+        <element kind="staticText" uuid="e567ab23-5555-6666-7777-888899990000" x="335" y="15" width="200" height="28"
+                 forecolor="#AA00CC" fontName="SansSerif" fontSize="20.0" bold="true" hTextAlign="Right"
+                 vTextAlign="Middle">
+            <text><![CDATA[ORDER RECEIPT]]></text>
+        </element>
+        <element kind="textField" uuid="f678ab34-6666-7777-8888-999900001111" x="335" y="45" width="200" height="15"
+                 forecolor="#2A0033" fontName="SansSerif" fontSize="10.0" bold="true" hTextAlign="Right"
+                 vTextAlign="Middle">
+            <expression><![CDATA["Order Code: " + $P{orderCode}]]></expression>
+        </element>
+        <element kind="textField" uuid="a789bc45-7777-8888-9999-000011112222" x="335" y="60" width="200" height="15"
+                 forecolor="#7F0099" fontName="SansSerif" fontSize="9.0" hTextAlign="Right" vTextAlign="Middle">
+            <expression><![CDATA["Date: " + $P{orderDate}]]></expression>
+        </element>
+        <element kind="line" uuid="b890cd56-8888-9999-0000-111122223333" x="0" y="95" width="535" height="1"
+                 forecolor="#EE99FF">
+            <pen lineWidth="1.0"/>
+        </element>
+    </title>
+    <pageHeader height="100" splitType="Stretch">
+        <element kind="rectangle" uuid="c901de67-9999-0000-1111-222233334444" x="0" y="5" width="255" height="85"
+                 forecolor="#EE99FF" backcolor="#FBE5FF" radius="4"/>
+        <element kind="staticText" uuid="d012ef78-0000-1111-2222-333344445555" x="12" y="12" width="230" height="14"
+                 forecolor="#7F0099" fontName="SansSerif" fontSize="9.0" bold="true" vTextAlign="Middle">
+            <text><![CDATA[CUSTOMER DETAILS (BILL TO)]]></text>
+        </element>
+        <element kind="textField" uuid="e123ab89-1111-2222-3333-444455556666" x="12" y="28" width="230" height="15"
+                 forecolor="#1E0024" fontName="SansSerif" fontSize="10.0" bold="true" vTextAlign="Middle">
+            <expression>
+                <![CDATA[$P{customerName} + ($P{shopName} != null && !$P{shopName}.isEmpty() ? " (" + $P{shopName} + ")" : "")]]></expression>
+        </element>
+        <element kind="textField" uuid="f234ab90-2222-3333-4444-555566667777" x="12" y="45" width="230" height="14"
+                 forecolor="#550066" fontName="SansSerif" fontSize="9.0" vTextAlign="Middle">
+            <expression><![CDATA["Email: " + ($P{customerEmail} != null ? $P{customerEmail} : "N/A")]]></expression>
+        </element>
+        <element kind="textField" uuid="a345bc01-3333-4444-5555-666677778888" x="12" y="60" width="230" height="14"
+                 forecolor="#550066" fontName="SansSerif" fontSize="9.0" vTextAlign="Middle">
+            <expression><![CDATA["Phone: " + ($P{customerPhone} != null ? $P{customerPhone} : "N/A")]]></expression>
+        </element>
+        <element kind="rectangle" uuid="b456cd12-4444-5555-6666-777788889999" x="280" y="5" width="255" height="85"
+                 forecolor="#EE99FF" backcolor="#FBE5FF" radius="4"/>
+        <element kind="staticText" uuid="c567de23-5555-6666-7777-888899990000" x="292" y="12" width="230" height="14"
+                 forecolor="#7F0099" fontName="SansSerif" fontSize="9.0" bold="true" vTextAlign="Middle">
+            <text><![CDATA[PAYMENT & ORDER INFO]]></text>
+        </element>
+        <element kind="staticText" uuid="d678ef34-6666-7777-8888-999900001111" x="292" y="30" width="85" height="15"
+                 forecolor="#550066" fontName="SansSerif" fontSize="9.0" bold="true" vTextAlign="Middle">
+            <text><![CDATA[Pay Code:]]></text>
+        </element>
+        <element kind="textField" uuid="e789ab45-7777-8888-9999-000011112222" x="380" y="30" width="142" height="15"
+                 forecolor="#1E0024" fontName="SansSerif" fontSize="9.0" bold="true" vTextAlign="Middle">
+            <expression><![CDATA[$P{payCode}]]></expression>
+        </element>
+        <element kind="staticText" uuid="f890ab56-8888-9999-0000-111122223333" x="292" y="47" width="85" height="15"
+                 forecolor="#550066" fontName="SansSerif" fontSize="9.0" bold="true" vTextAlign="Middle">
+            <text><![CDATA[Payment Status:]]></text>
+        </element>
+        <element kind="textField" uuid="a901bc67-9999-0000-1111-222233334444" x="380" y="47" width="142" height="15"
+                 forecolor="#DD33FF" fontName="SansSerif" fontSize="9.0" bold="true" vTextAlign="Middle">
+            <expression><![CDATA[$P{paymentStatus}]]></expression>
+        </element>
+        <element kind="staticText" uuid="b012cd78-0000-1111-2222-333344445555" x="292" y="64" width="85" height="15"
+                 forecolor="#550066" fontName="SansSerif" fontSize="9.0" bold="true" vTextAlign="Middle">
+            <text><![CDATA[Order Status:]]></text>
+        </element>
+        <element kind="textField" uuid="c123de89-1111-2222-3333-444455556666" x="380" y="64" width="142" height="15"
+                 forecolor="#AA00CC" fontName="SansSerif" fontSize="9.0" bold="true" vTextAlign="Middle">
+            <expression><![CDATA[$P{orderStatus}]]></expression>
+        </element>
+    </pageHeader>
+    <columnHeader height="25" splitType="Stretch">
+        <element kind="rectangle" uuid="d234ef90-2222-3333-4444-555566667777" x="0" y="0" width="535" height="25"
+                 forecolor="#2A0033" backcolor="#2A0033" radius="2"/>
+        <element kind="staticText" uuid="e345ab01-3333-4444-5555-666677778888" x="10" y="0" width="30" height="25"
+                 forecolor="#FFFFFF" fontName="SansSerif" fontSize="9.0" bold="true" hTextAlign="Center"
+                 vTextAlign="Middle">
+            <text><![CDATA[#]]></text>
+        </element>
+        <element kind="staticText" uuid="f456ab12-4444-5555-6666-777788889999" x="50" y="0" width="220" height="25"
+                 forecolor="#FFFFFF" fontName="SansSerif" fontSize="9.0" bold="true" hTextAlign="Left"
+                 vTextAlign="Middle">
+            <text><![CDATA[PRODUCT DESCRIPTION]]></text>
+        </element>
+        <element kind="staticText" uuid="a567bc23-5555-6666-7777-888899990000" x="270" y="0" width="85" height="25"
+                 forecolor="#FFFFFF" fontName="SansSerif" fontSize="9.0" bold="true" hTextAlign="Right"
+                 vTextAlign="Middle">
+            <text><![CDATA[UNIT PRICE]]></text>
+        </element>
+        <element kind="staticText" uuid="b678cd34-6666-7777-8888-999900001111" x="365" y="0" width="55" height="25"
+                 forecolor="#FFFFFF" fontName="SansSerif" fontSize="9.0" bold="true" hTextAlign="Center"
+                 vTextAlign="Middle">
+            <text><![CDATA[QTY]]></text>
+        </element>
+        <element kind="staticText" uuid="c789de45-7777-8888-9999-000011112222" x="430" y="0" width="95" height="25"
+                 forecolor="#FFFFFF" fontName="SansSerif" fontSize="9.0" bold="true" hTextAlign="Right"
+                 vTextAlign="Middle">
+            <text><![CDATA[TOTAL (LKR)]]></text>
+        </element>
+    </columnHeader>
+    <detail>
+        <band height="25" splitType="Stretch">
+            <element kind="textField" uuid="d890ef56-8888-9999-0000-111122223333" x="10" y="0" width="30" height="24"
+                     forecolor="#550066" fontName="SansSerif" fontSize="9.0" hTextAlign="Center" vTextAlign="Middle">
+                <expression><![CDATA[$V{REPORT_COUNT}]]></expression>
+            </element>
+            <element kind="textField" uuid="e901ab67-9999-0000-1111-222233334444" x="50" y="0" width="220" height="24"
+                     forecolor="#1E0024" fontName="SansSerif" fontSize="9.0" bold="true" hTextAlign="Left"
+                     vTextAlign="Middle">
+                <expression><![CDATA[$F{productName}]]></expression>
+            </element>
+            <element kind="textField" uuid="f012ab78-0000-1111-2222-333344445555" x="270" y="0" width="85" height="24"
+                     forecolor="#2A0033" fontName="SansSerif" fontSize="9.0" pattern="#,##0.00" hTextAlign="Right"
+                     vTextAlign="Middle">
+                <expression><![CDATA[$F{unitPrice}]]></expression>
+            </element>
+            <element kind="textField" uuid="a123bc89-1111-2222-3333-444455556666" x="365" y="0" width="55" height="24"
+                     forecolor="#2A0033" fontName="SansSerif" fontSize="9.0" hTextAlign="Center" vTextAlign="Middle">
+                <expression><![CDATA[$F{quantity}]]></expression>
+            </element>
+            <element kind="textField" uuid="b234cd90-2222-3333-4444-555566667777" x="430" y="0" width="95" height="24"
+                     forecolor="#1E0024" fontName="SansSerif" fontSize="9.0" pattern="#,##0.00" bold="true"
+                     hTextAlign="Right" vTextAlign="Middle">
+                <expression><![CDATA[$F{subTotal}]]></expression>
+            </element>
+            <element kind="line" uuid="c345de01-3333-4444-5555-666677778888" x="0" y="24" width="535" height="1"
+                     forecolor="#F6CCFF"/>
+        </band>
+    </detail>
+    <summary height="150" splitType="Stretch">
+        <element kind="line" uuid="d456ef12-4444-5555-6666-777788889999" x="0" y="5" width="535" height="1"
+                 forecolor="#EE99FF"/>
+        <element kind="staticText" uuid="e567ab23-5555-6666-7777-888899990000" x="0" y="20" width="280" height="15"
+                 forecolor="#7F0099" fontName="SansSerif" fontSize="9.0" bold="true" vTextAlign="Middle">
+            <text><![CDATA[Important Information:]]></text>
+        </element>
+        <element kind="staticText" uuid="f678ab34-6666-7777-8888-999900001111" x="0" y="37" width="280" height="35"
+                 forecolor="#550066" fontName="SansSerif" fontSize="8.0" vTextAlign="Top">
+            <text><![CDATA[• Please quote the Pay Code for payment tracking.
+• This is a computer-generated invoice and requires no signature.]]></text>
+        </element>
+        <element kind="staticText" uuid="a789bc45-7777-8888-9999-000011112222" x="310" y="20" width="110" height="18"
+                 forecolor="#550066" fontName="SansSerif" fontSize="9.0" bold="false" hTextAlign="Right"
+                 vTextAlign="Middle">
+            <text><![CDATA[Paid Amount:]]></text>
+        </element>
+        <element kind="textField" uuid="b890cd56-8888-9999-0000-111122223333" x="430" y="20" width="95" height="18"
+                 forecolor="#1E0024" fontName="SansSerif" fontSize="9.0" pattern="#,##0.00" hTextAlign="Right"
+                 vTextAlign="Middle">
+            <expression><![CDATA[$P{paidAmount} != null ? $P{paidAmount} : 0.0]]></expression>
+        </element>
+        <element kind="staticText" uuid="c901de67-9999-0000-1111-222233334444" x="310" y="40" width="110" height="18"
+                 forecolor="#550066" fontName="SansSerif" fontSize="9.0" bold="false" hTextAlign="Right"
+                 vTextAlign="Middle">
+            <text><![CDATA[Balance Amount:]]></text>
+        </element>
+        <element kind="textField" uuid="d012ef78-0000-1111-2222-333344445555" x="430" y="40" width="95" height="18"
+                 forecolor="#1E0024" fontName="SansSerif" fontSize="9.0" pattern="#,##0.00" hTextAlign="Right"
+                 vTextAlign="Middle">
+            <expression><![CDATA[$P{balanceAmount} != null ? $P{balanceAmount} : $P{grandTotal}]]></expression>
+        </element>
+        <element kind="rectangle" uuid="e123ab89-1111-2222-3333-444455556666" x="300" y="65" width="235" height="30"
+                 forecolor="#2A0033" backcolor="#2A0033" radius="3"/>
+        <element kind="staticText" uuid="f234ab90-2222-3333-4444-555566667777" x="310" y="65" width="100" height="30"
+                 forecolor="#FFFFFF" fontName="SansSerif" fontSize="10.0" bold="true" hTextAlign="Left"
+                 vTextAlign="Middle">
+            <text><![CDATA[GRAND TOTAL]]></text>
+        </element>
+        <element kind="textField" uuid="a345bc01-3333-4444-5555-666677778888" x="410" y="65" width="115" height="30"
+                 forecolor="#EE99FF" fontName="SansSerif" fontSize="11.0" pattern="LKR #,##0.00" bold="true"
+                 hTextAlign="Right" vTextAlign="Middle">
+            <expression><![CDATA[$P{grandTotal}]]></expression>
+        </element>
+        <element kind="line" uuid="b456cd12-4444-5555-6666-777788889999" x="0" y="115" width="535" height="1"
+                 forecolor="#EE99FF"/>
+        <element kind="staticText" uuid="c567de23-5555-6666-7777-888899990000" x="0" y="125" width="535" height="20"
+                 forecolor="#7F0099" fontName="SansSerif" fontSize="9.0" italic="true" hTextAlign="Center"
+                 vTextAlign="Middle">
+            <text><![CDATA[Thank you for your business with NexaSupply Distribution!]]></text>
+        </element>
+    </summary>
+</jasperReport>

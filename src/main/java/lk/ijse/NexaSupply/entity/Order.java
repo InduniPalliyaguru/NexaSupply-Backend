@@ -39,4 +39,7 @@ public class Order {
     @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
     private Shipment shipment;
 
+    @OneToOne
+    private Payment payment;
+
 }

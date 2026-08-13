@@ -37,7 +37,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final NotificationService notificationService;
 
     @Override
-    public void createPendingPaymentForOrder(Order order) {
+    public Payment createPendingPaymentForOrder(Order order) {
         log.info("Execute createPendingPaymentForOrder method");
 
         Payment payment = new Payment();
@@ -50,7 +50,7 @@ public class PaymentServiceImpl implements PaymentService {
         payment.setPaymentDate(LocalDateTime.now());
         payment.setOrder(order);
 
-        paymentRepository.save(payment);
+        return paymentRepository.save(payment);
     }
 
     @Override

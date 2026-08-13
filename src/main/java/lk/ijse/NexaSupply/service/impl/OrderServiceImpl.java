@@ -1,9 +1,6 @@
 package lk.ijse.NexaSupply.service.impl;
 
-import lk.ijse.NexaSupply.dto.CreditLedgerDTO;
-import lk.ijse.NexaSupply.dto.OrderProductDTO;
-import lk.ijse.NexaSupply.dto.OrderRequestDTO;
-import lk.ijse.NexaSupply.dto.OrderResponseDTO;
+import lk.ijse.NexaSupply.dto.*;
 import lk.ijse.NexaSupply.entity.*;
 import lk.ijse.NexaSupply.enumeration.DataStatus;
 import lk.ijse.NexaSupply.enumeration.LedgerType;
@@ -39,6 +36,8 @@ public class OrderServiceImpl implements OrderService {
     private final PaymentService paymentService;
     private final CreditLedgerService creditLedgerService;
     private final NotificationService notificationService;
+    private final EmailService emailService;
+    private final ReportService reportService;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -147,7 +146,9 @@ public class OrderServiceImpl implements OrderService {
         Order order = optionalOrder.get();
 
         if (status == OrderStatus.APPROVED && order.getOrderStatus() == OrderStatus.PENDING) {
-            paymentService.createPendingPaymentForOrder(order);
+            Payment pendingPay = paymentService.createPendingPaymentForOrder(order);
+            System.out.println("Pay COde" + pendingPay.getPaymentCode());
+            order.setPayment(pendingPay);
         }
 
         if (status == OrderStatus.CANCELLED && order.getOrderStatus() != OrderStatus.CANCELLED) {
@@ -178,6 +179,11 @@ public class OrderServiceImpl implements OrderService {
 
         order.setOrderStatus(status);
         Order savedOrder = orderRepository.save(order);
+        System.out.println("Pay COde" + savedOrder.getPayment().getPaymentCode());
+
+        if (status == OrderStatus.APPROVED) {
+            sendInvoiceEmail(savedOrder);
+        }
 
         if (savedOrder.getCustomer() != null) {
             notificationService.createNotification(
@@ -260,6 +266,70 @@ public class OrderServiceImpl implements OrderService {
                 order.getCustomer().getEmail(),
                 items
         );
+    }
+
+    private void sendInvoiceEmail(Order order) {
+        try {
+
+            User customer = order.getCustomer();
+            if (customer == null || customer.getEmail() == null) {
+                throw new CustomException(404, "Customer or Email is null for Order Code " + order.getOrderCode());
+            }
+
+            List<OrderItemReportDTO> dto = new ArrayList<>();
+            if (order.getOrderProductList() != null) {
+
+                List<OrderProduct> orderProductList = order.getOrderProductList();
+                for (OrderProduct item : orderProductList) {
+
+                    OrderItemReportDTO itemDTO = new OrderItemReportDTO();
+                    itemDTO.setProductName(item.getProduct().getName());
+                    itemDTO.setUnitPrice(item.getUnitPrice());
+                    itemDTO.setQuantity(item.getQuantity());
+                    itemDTO.setSubTotal(item.getUnitPrice() * item.getQuantity());
+                    dto.add(itemDTO);
+                }
+            }
+
+            OrderInvoiceReportDTO reportDTO = new OrderInvoiceReportDTO();
+            reportDTO.setOrderCode(order.getOrderCode());
+            reportDTO.setOrderDate(order.getOrderDate() != null ? order.getOrderDate().toString() : LocalDateTime.now().toString());
+            reportDTO.setOrderStatus(order.getOrderStatus().name());
+            reportDTO.setCustomerName(customer.getFullName());
+            reportDTO.setShopName(customer.getShopName() != null ? customer.getShopName() : "");
+            reportDTO.setCustomerEmail(customer.getEmail());
+            reportDTO.setCustomerPhone(customer.getPhone() != null ? customer.getPhone() : "N/A");
+            reportDTO.setPayCode(order.getPayment().getPaymentCode());
+            reportDTO.setPaymentStatus(order.getPayment().getPaymentStatus().name());
+            reportDTO.setGrandTotal(order.getTotalPrice());
+            reportDTO.setPaidAmount(order.getPayment().getPaidAmount());
+            reportDTO.setBalanceAmount(order.getPayment().getBalanceAmount());
+            reportDTO.setItems(dto);
+
+            byte[] pdfBytes = reportService.generateOrderInvoicePdf(reportDTO);
+
+            String emailSubject = "Order Approved & Invoice - " + order.getOrderCode();
+            String emailBody = "<h3>Dear " + customer.getFullName() + ",</h3>" +
+                    "<p>Your order <b>" + order.getOrderCode() + "</b> has been <b>APPROVED</b> successfully!</p>" +
+                    "<p>Please find the attached invoice for your reference.</p><br>" +
+                    "<p>Thank you for doing business with <b>NexaSupply</b>!</p>";
+
+            String attachmentFileName = "Invoice_" + order.getOrderCode() + ".pdf";
+
+            emailService.sendOrderInvoiceEmail(
+                    customer.getEmail(),
+                    emailSubject,
+                    emailBody,
+                    pdfBytes,
+                    attachmentFileName
+            );
+            log.info("Invoice email send successfully");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new CustomException(500, "Failed to send email");
+
+        }
     }
 
 }
