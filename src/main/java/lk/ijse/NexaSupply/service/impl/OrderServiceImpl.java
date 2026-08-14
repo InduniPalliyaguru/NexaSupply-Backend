@@ -309,10 +309,24 @@ public class OrderServiceImpl implements OrderService {
             byte[] pdfBytes = reportService.generateOrderInvoicePdf(reportDTO);
 
             String emailSubject = "Order Approved & Invoice - " + order.getOrderCode();
-            String emailBody = "<h3>Dear " + customer.getFullName() + ",</h3>" +
-                    "<p>Your order <b>" + order.getOrderCode() + "</b> has been <b>APPROVED</b> successfully!</p>" +
-                    "<p>Please find the attached invoice for your reference.</p><br>" +
-                    "<p>Thank you for doing business with <b>NexaSupply</b>!</p>";
+
+            String emailBody = "<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e8d5ea; border-radius: 8px; padding: 25px; background-color: #ffffff;'>"
+                    + "<h2 style='color: #3b0a45; text-align: center; margin-bottom: 20px;'>Order Approved! 🎉</h2>"
+                    + "<p style='color: #333333; font-size: 15px;'>Dear <b>" + customer.getFullName() + "</b>,</p>"
+                    + "<p style='color: #555555; line-height: 1.5;'>Great news! Your order has been reviewed and <b>APPROVED</b> by our distribution team.</p>"
+
+                    + "<div style='background-color: #faf2fc; border-left: 4px solid #6f2c91; padding: 18px; margin: 20px 0; border-radius: 6px;'>"
+                    + "<h4 style='margin: 0 0 10px 0; color: #4a005b; text-transform: uppercase; letter-spacing: 0.5px;'>Order Details</h4>"
+                    + "<p style='margin: 6px 0; color: #333333;'><b>Order Code:</b> " + order.getOrderCode() + "</p>"
+                    + "<p style='margin: 6px 0; color: #333333;'><b>Order Status:</b> <span style='color: #6f2c91; font-weight: bold;'>APPROVED</span></p>"
+                    + "</div>"
+
+                    + "<p style='color: #555555; line-height: 1.5;'>Please find your official order invoice attached to this email as a PDF document for your reference.</p>"
+                    + "<br/>"
+                    + "<p style='color: #555555; margin: 0;'>Thank you for doing business with <b style='color: #4a005b;'>NexaSupply</b>!</p>"
+                    + "<br/>"
+                    + "<p style='color: #333333; margin: 0;'>Best Regards,<br/><b style='color: #4a005b;'>NexaSupply Distribution Team</b></p>"
+                    + "</div>";
 
             String attachmentFileName = "Invoice_" + order.getOrderCode() + ".pdf";
 

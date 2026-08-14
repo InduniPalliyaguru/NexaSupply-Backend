@@ -1,9 +1,8 @@
 package lk.ijse.NexaSupply.service.impl;
 
-import lk.ijse.NexaSupply.dto.CreditLedgerDTO;
-import lk.ijse.NexaSupply.dto.PaymentDTO;
-import lk.ijse.NexaSupply.dto.PaymentProcessDTO;
+import lk.ijse.NexaSupply.dto.*;
 import lk.ijse.NexaSupply.entity.Order;
+import lk.ijse.NexaSupply.entity.OrderProduct;
 import lk.ijse.NexaSupply.entity.Payment;
 import lk.ijse.NexaSupply.entity.User;
 import lk.ijse.NexaSupply.enumeration.LedgerType;
@@ -11,9 +10,7 @@ import lk.ijse.NexaSupply.enumeration.PaymentStatus;
 import lk.ijse.NexaSupply.exception.CustomException;
 import lk.ijse.NexaSupply.repository.PaymentRepository;
 import lk.ijse.NexaSupply.repository.UserRepository;
-import lk.ijse.NexaSupply.service.CreditLedgerService;
-import lk.ijse.NexaSupply.service.NotificationService;
-import lk.ijse.NexaSupply.service.PaymentService;
+import lk.ijse.NexaSupply.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -35,6 +32,8 @@ public class PaymentServiceImpl implements PaymentService {
     private final UserRepository userRepository;
     private final CreditLedgerService creditLedgerService;
     private final NotificationService notificationService;
+    private final EmailService emailService;
+    private final ReportService reportService;
 
     @Override
     public Payment createPendingPaymentForOrder(Order order) {
@@ -77,6 +76,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         if (newBalanceAmount == 0) {
             payment.setPaymentStatus(PaymentStatus.COMPLETED);
+            sendFinalPaymentReceiptEmail(payment);
         } else {
             payment.setPaymentStatus(PaymentStatus.PARTIAL);
         }
@@ -171,6 +171,86 @@ public class PaymentServiceImpl implements PaymentService {
             }
         }
         return dto;
+    }
+
+    private void sendFinalPaymentReceiptEmail(Payment payment) {
+
+        try {
+
+            Order order = payment.getOrder();
+            if (order == null || order.getCustomer() == null) {
+                throw new CustomException(404, "Order or customer not found for payment code: " + payment.getPaymentCode());
+            }
+            User customer = order.getCustomer();
+
+            List<OrderItemReportDTO> dto = new ArrayList<>();
+            if (order.getOrderProductList() != null) {
+
+                List<OrderProduct> orderProductList = order.getOrderProductList();
+                for (OrderProduct item : orderProductList) {
+
+                    OrderItemReportDTO itemDTO = new OrderItemReportDTO();
+                    itemDTO.setProductName(item.getProduct().getName());
+                    itemDTO.setUnitPrice(item.getUnitPrice());
+                    itemDTO.setQuantity(item.getQuantity());
+                    itemDTO.setSubTotal(item.getUnitPrice() * item.getQuantity());
+                    dto.add(itemDTO);
+                }
+            }
+
+            OrderInvoiceReportDTO reportDTO = new OrderInvoiceReportDTO();
+            reportDTO.setOrderCode(order.getOrderCode());
+            reportDTO.setOrderDate(order.getOrderDate() != null ? order.getOrderDate().toString() : LocalDateTime.now().toString());
+            reportDTO.setOrderStatus(order.getOrderStatus().name());
+            reportDTO.setCustomerName(customer.getFullName());
+            reportDTO.setShopName(customer.getShopName() != null ? customer.getShopName() : "");
+            reportDTO.setCustomerEmail(customer.getEmail());
+            reportDTO.setCustomerPhone(customer.getPhone() != null ? customer.getPhone() : "N/A");
+            reportDTO.setPayCode(order.getPayment().getPaymentCode());
+            reportDTO.setPaymentStatus(order.getPayment().getPaymentStatus().name());
+            reportDTO.setGrandTotal(order.getTotalPrice());
+            reportDTO.setPaidAmount(order.getPayment().getPaidAmount());
+            reportDTO.setBalanceAmount(order.getPayment().getBalanceAmount());
+            reportDTO.setItems(dto);
+
+            byte[] pdfBytes = reportService.generateOrderInvoicePdf(reportDTO);
+
+            String subject = "Payment Confirmation & Final Receipt - " + order.getOrderCode();
+
+            String body = "<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e8d5ea; border-radius: 8px; padding: 25px; background-color: #ffffff;'>"
+                    + "<h2 style='color: #3b0a45; text-align: center; margin-bottom: 20px;'>Payment Completed Successfully! 🧾</h2>"
+                    + "<p style='color: #333333; font-size: 15px;'>Dear <b>" + order.getCustomer().getFullName() + "</b>,</p>"
+                    + "<p style='color: #555555; line-height: 1.5;'>We have received your final payment for order <b>" + order.getOrderCode() + "</b>. Your order is now fully settled!</p>"
+
+                    + "<div style='background-color: #faf2fc; border-left: 4px solid #6f2c91; padding: 18px; margin: 20px 0; border-radius: 6px;'>"
+                    + "<h4 style='margin: 0 0 10px 0; color: #4a005b; text-transform: uppercase; letter-spacing: 0.5px;'>Payment Details</h4>"
+                    + "<p style='margin: 6px 0; color: #333333;'><b>Payment Code:</b> " + payment.getPaymentCode() + "</p>"
+                    + "<p style='margin: 6px 0; color: #333333;'><b>Order Code:</b> " + order.getOrderCode() + "</p>"
+                    + "<p style='margin: 6px 0; color: #333333;'><b>Payment Status:</b> <span style='color: #6f2c91; font-weight: bold;'>COMPLETED (FULL PAID)</span></p>"
+                    + "<p style='margin: 6px 0; color: #333333;'><b>Total Paid Amount:</b> <span style='color: #3b0a45; font-weight: bold;'>LKR " + String.format("%,.2f", payment.getPaidAmount()) + "</span></p>"
+                    + "<p style='margin: 6px 0; color: #333333;'><b>Remaining Balance:</b> <span style='color: #28a745; font-weight: bold;'>LKR 0.00</span></p>"
+                    + "</div>"
+
+                    + "<p style='color: #555555; line-height: 1.5;'>Please find your official payment receipt attached to this email as a PDF document.</p>"
+                    + "<br/>"
+                    + "<p style='color: #333333; margin: 0;'>Best Regards,<br/><b style='color: #4a005b;'>NexaSupply Distribution Team</b></p>"
+                    + "</div>";
+
+            String fileName = "Final_Receipt_" + order.getOrderCode() + ".pdf";
+
+            emailService.sendOrderInvoiceEmail(
+                    customer.getEmail(),
+                    subject,
+                    body,
+                    pdfBytes,
+                    fileName
+            );
+            log.info("Final Receipt Email Sent to {}", customer.getEmail());
+
+        } catch (Exception e) {
+            log.error("Failed to send final payment receipt email for payment code: {}", payment.getPaymentCode(), e);
+        }
+
     }
 
 

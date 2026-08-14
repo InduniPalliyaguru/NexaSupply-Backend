@@ -51,25 +51,25 @@ public class EmailServiceImpl implements EmailService {
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "utf-8");
 
             helper.setTo(toEmail);
-            helper.setSubject("🎉 Your NexaSupply Account Has Been Approved!");
+            helper.setSubject("Your NexaSupply Account Has Been Approved!");
 
             double limitValue = (creditLimit != null) ? creditLimit : 0.0;
 
-            String htmlContent = "<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px;'>"
-                    + "<h2 style='color: #2c3e50; text-align: center;'>Welcome to NexaSupply!</h2>"
-                    + "<p>Dear <b>" + customerName + "</b>,</p>"
-                    + "<p>Great news! Your account registration has been reviewed and <b>APPROVED</b> by our administration team.</p>"
+            String htmlContent = "<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e8d5ea; border-radius: 8px; padding: 25px; background-color: #ffffff;'>"
+                    + "<h2 style='color: #3b0a45; text-align: center; margin-bottom: 20px;'>Welcome to NexaSupply! 🎉</h2>"
+                    + "<p style='color: #333333; font-size: 15px;'>Dear <b>" + customerName + "</b>,</p>"
+                    + "<p style='color: #555555; line-height: 1.5;'>Great news! Your account registration has been reviewed and <b>APPROVED</b> by our administration team.</p>"
 
-                    + "<div style='background-color: #f8f9fa; border-left: 4px solid #28a745; padding: 15px; margin: 20px 0; border-radius: 4px;'>"
-                    + "<h4 style='margin-top: 0; color: #28a745;'>Account Details:</h4>"
-                    + "<p style='margin: 5px 0;'><b>Registered Email:</b> " + toEmail + "</p>"
-                    + "<p style='margin: 5px 0;'><b>Account Status:</b> <span style='color: green; font-weight: bold;'>ACTIVE / APPROVED</span></p>"
-                    + "<p style='margin: 5px 0;'><b>Approved Credit Limit:</b> <span style='font-size: 16px; color: #0d6efd; font-weight: bold;'>LKR " + String.format("%,.2f", limitValue) + "</span></p>"
+                    + "<div style='background-color: #faf2fc; border-left: 4px solid #6f2c91; padding: 18px; margin: 20px 0; border-radius: 6px;'>"
+                    + "<h4 style='margin: 0 0 10px 0; color: #4a005b; text-transform: uppercase; letter-spacing: 0.5px;'>Account Details</h4>"
+                    + "<p style='margin: 6px 0; color: #333333;'><b>Registered Email:</b> " + toEmail + "</p>"
+                    + "<p style='margin: 6px 0; color: #333333;'><b>Account Status:</b> <span style='color: #6f2c91; font-weight: bold;'>ACTIVE / APPROVED</span></p>"
+                    + "<p style='margin: 6px 0; color: #333333;'><b>Approved Credit Limit:</b> <span style='font-size: 16px; color: #3b0a45; font-weight: bold;'>LKR " + String.format("%,.2f", limitValue) + "</span></p>"
                     + "</div>"
 
-                    + "<p>You can now log in to your account using your credentials and start placing orders up to your allocated credit limit.</p>"
+                    + "<p style='color: #555555; line-height: 1.5;'>You can now log in to your account using your credentials and start placing orders up to your allocated credit limit.</p>"
                     + "<br/>"
-                    + "<p>Best Regards,<br/><b>NexaSupply Distribution Team</b></p>"
+                    + "<p style='color: #333333; margin: 0;'>Best Regards,<br/><b style='color: #4a005b;'>NexaSupply Distribution Team</b></p>"
                     + "</div>";
 
             helper.setText(htmlContent, true);
