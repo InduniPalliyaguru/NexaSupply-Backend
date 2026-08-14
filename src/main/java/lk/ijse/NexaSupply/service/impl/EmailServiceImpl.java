@@ -40,4 +40,46 @@ public class EmailServiceImpl implements EmailService {
         }
 
     }
+
+    @Override
+    public void sendAccountApprovalEmail(String toEmail, String customerName, Double creditLimit) {
+        log.info("Execute sendAccountApprovalEmail");
+
+        try {
+
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "utf-8");
+
+            helper.setTo(toEmail);
+            helper.setSubject("🎉 Your NexaSupply Account Has Been Approved!");
+
+            double limitValue = (creditLimit != null) ? creditLimit : 0.0;
+
+            String htmlContent = "<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px;'>"
+                    + "<h2 style='color: #2c3e50; text-align: center;'>Welcome to NexaSupply!</h2>"
+                    + "<p>Dear <b>" + customerName + "</b>,</p>"
+                    + "<p>Great news! Your account registration has been reviewed and <b>APPROVED</b> by our administration team.</p>"
+
+                    + "<div style='background-color: #f8f9fa; border-left: 4px solid #28a745; padding: 15px; margin: 20px 0; border-radius: 4px;'>"
+                    + "<h4 style='margin-top: 0; color: #28a745;'>Account Details:</h4>"
+                    + "<p style='margin: 5px 0;'><b>Registered Email:</b> " + toEmail + "</p>"
+                    + "<p style='margin: 5px 0;'><b>Account Status:</b> <span style='color: green; font-weight: bold;'>ACTIVE / APPROVED</span></p>"
+                    + "<p style='margin: 5px 0;'><b>Approved Credit Limit:</b> <span style='font-size: 16px; color: #0d6efd; font-weight: bold;'>LKR " + String.format("%,.2f", limitValue) + "</span></p>"
+                    + "</div>"
+
+                    + "<p>You can now log in to your account using your credentials and start placing orders up to your allocated credit limit.</p>"
+                    + "<br/>"
+                    + "<p>Best Regards,<br/><b>NexaSupply Distribution Team</b></p>"
+                    + "</div>";
+
+            helper.setText(htmlContent, true);
+            mailSender.send(message);
+            log.info("Account Approval Email sent successfully");
+
+        } catch (Exception e) {
+            log.error("Failed to send email with attachment to {}", toEmail);
+            throw new CustomException(500, "Failed to send account approval email to " + toEmail);
+        }
+
+    }
 }

@@ -10,6 +10,7 @@ import lk.ijse.NexaSupply.exception.CustomException;
 import lk.ijse.NexaSupply.repository.UserRepository;
 import lk.ijse.NexaSupply.service.AuditLogService;
 import lk.ijse.NexaSupply.service.CreditLedgerService;
+import lk.ijse.NexaSupply.service.EmailService;
 import lk.ijse.NexaSupply.service.UserService;
 import lk.ijse.NexaSupply.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final AuditLogService auditLogService;
     private final CreditLedgerService creditLedgerService;
+    private final EmailService emailService;
 
     @Override
     public void registerRetailer(RegisterRequestDTO request) {
@@ -149,6 +151,12 @@ public class UserServiceImpl implements UserService {
 
         String action = "APPROVED_RETAILER | Code: " + userCode + " | Credit Limit: " + creditLimit;
         auditLogService.logAction(SecurityUtils.getCurrentUserEmail(), action);
+
+        emailService.sendAccountApprovalEmail(
+                user.getEmail(),
+                user.getFullName(),
+                creditLimit
+        );
     }
 
     @Override
