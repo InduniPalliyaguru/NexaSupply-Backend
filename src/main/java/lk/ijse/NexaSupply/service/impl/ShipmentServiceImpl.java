@@ -5,6 +5,7 @@ import lk.ijse.NexaSupply.dto.ShipmentResponseDTO;
 import lk.ijse.NexaSupply.entity.Driver;
 import lk.ijse.NexaSupply.entity.Order;
 import lk.ijse.NexaSupply.entity.Shipment;
+import lk.ijse.NexaSupply.entity.User;
 import lk.ijse.NexaSupply.enumeration.DataStatus;
 import lk.ijse.NexaSupply.enumeration.DriverStatus;
 import lk.ijse.NexaSupply.enumeration.OrderStatus;
@@ -14,6 +15,7 @@ import lk.ijse.NexaSupply.repository.DriverRepository;
 import lk.ijse.NexaSupply.repository.OrderRepository;
 import lk.ijse.NexaSupply.repository.ShipmentRepository;
 import lk.ijse.NexaSupply.service.AuditLogService;
+import lk.ijse.NexaSupply.service.EmailService;
 import lk.ijse.NexaSupply.service.NotificationService;
 import lk.ijse.NexaSupply.service.ShipmentService;
 import lk.ijse.NexaSupply.util.SecurityUtils;
@@ -39,6 +41,7 @@ public class ShipmentServiceImpl implements ShipmentService {
     private final DriverRepository driverRepository;
     private final AuditLogService auditLogService;
     private final NotificationService notificationService;
+    private final EmailService emailService;
 
     @Override
     public ShipmentResponseDTO createShipment(ShipmentRequestDTO dto) {
@@ -69,10 +72,22 @@ public class ShipmentServiceImpl implements ShipmentService {
         Shipment saved = shipmentRepository.save(shipment);
 
         if (saved.getOrder() != null && saved.getOrder().getCustomer() != null) {
+            User customer = saved.getOrder().getCustomer();
+            Driver driver = saved.getDriver();
+
             notificationService.createNotification(
-                    saved.getOrder().getCustomer(),
+                    customer,
                     "Shipment Created",
                     "Shipment " + saved.getTrackingNumber() + " has been created for your order " + saved.getOrder().getOrderCode() + "."
+            );
+
+            emailService.sendShipmentCreatedEmail(
+                    customer.getEmail(),
+                    customer.getFullName(),
+                    saved.getOrder().getOrderCode(),
+                    saved.getTrackingNumber(),
+                    driver.getDriverName(),
+                    driver.getPhone()
             );
         }
 
@@ -116,10 +131,21 @@ public class ShipmentServiceImpl implements ShipmentService {
         Shipment updated = shipmentRepository.save(shipment);
 
         if (shipment.getOrder() != null && shipment.getOrder().getCustomer() != null) {
+            User customer = shipment.getOrder().getCustomer();
             notificationService.createNotification(
-                    shipment.getOrder().getCustomer(),
+                    customer,
                     "Shipment Status Updated",
                     "Your shipment " + trackingNumber + " status is now " + status + "."
+            );
+
+            emailService.sendShipmentStatusUpdateEmail(
+                    customer.getEmail(),
+                    customer.getFullName(),
+                    shipment.getOrder().getOrderCode(),
+                    trackingNumber,
+                    driver != null ? driver.getDriverName() : "N/A",
+                    driver != null ? driver.getPhone() : "N/A",
+                    status.name()
             );
         }
 

@@ -6,4 +6,8 @@ public interface EmailService {
 
     void sendAccountApprovalEmail(String toEmail, String customerName, Double creditLimit);
 
+    void sendShipmentCreatedEmail(String toEmail, String customerName, String orderCode, String trackingNumber, String driverName, String driverPhone);
+
+    void sendShipmentStatusUpdateEmail(String toEmail, String customerName, String orderCode, String trackingNumber, String driverName, String driverPhone, String status);
+
 }
