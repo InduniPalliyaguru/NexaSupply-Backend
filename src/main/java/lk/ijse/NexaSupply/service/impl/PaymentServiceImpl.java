@@ -34,6 +34,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final NotificationService notificationService;
     private final EmailService emailService;
     private final ReportService reportService;
+    private final OrderService orderService;
 
     @Override
     public Payment createPendingPaymentForOrder(Order order) {
@@ -183,35 +184,7 @@ public class PaymentServiceImpl implements PaymentService {
             }
             User customer = order.getCustomer();
 
-            List<OrderItemReportDTO> dto = new ArrayList<>();
-            if (order.getOrderProductList() != null) {
-
-                List<OrderProduct> orderProductList = order.getOrderProductList();
-                for (OrderProduct item : orderProductList) {
-
-                    OrderItemReportDTO itemDTO = new OrderItemReportDTO();
-                    itemDTO.setProductName(item.getProduct().getName());
-                    itemDTO.setUnitPrice(item.getUnitPrice());
-                    itemDTO.setQuantity(item.getQuantity());
-                    itemDTO.setSubTotal(item.getUnitPrice() * item.getQuantity());
-                    dto.add(itemDTO);
-                }
-            }
-
-            OrderInvoiceReportDTO reportDTO = new OrderInvoiceReportDTO();
-            reportDTO.setOrderCode(order.getOrderCode());
-            reportDTO.setOrderDate(order.getOrderDate() != null ? order.getOrderDate().toString() : LocalDateTime.now().toString());
-            reportDTO.setOrderStatus(order.getOrderStatus().name());
-            reportDTO.setCustomerName(customer.getFullName());
-            reportDTO.setShopName(customer.getShopName() != null ? customer.getShopName() : "");
-            reportDTO.setCustomerEmail(customer.getEmail());
-            reportDTO.setCustomerPhone(customer.getPhone() != null ? customer.getPhone() : "N/A");
-            reportDTO.setPayCode(order.getPayment().getPaymentCode());
-            reportDTO.setPaymentStatus(order.getPayment().getPaymentStatus().name());
-            reportDTO.setGrandTotal(order.getTotalPrice());
-            reportDTO.setPaidAmount(order.getPayment().getPaidAmount());
-            reportDTO.setBalanceAmount(order.getPayment().getBalanceAmount());
-            reportDTO.setItems(dto);
+            OrderInvoiceReportDTO reportDTO = orderService.getOrderInvoiceReportData(order.getOrderCode());
 
             byte[] pdfBytes = reportService.generateOrderInvoicePdf(reportDTO);
 

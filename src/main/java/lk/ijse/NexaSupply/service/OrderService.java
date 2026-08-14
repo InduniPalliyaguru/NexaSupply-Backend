@@ -1,5 +1,6 @@
 package lk.ijse.NexaSupply.service;
 
+import lk.ijse.NexaSupply.dto.OrderInvoiceReportDTO;
 import lk.ijse.NexaSupply.dto.OrderRequestDTO;
 import lk.ijse.NexaSupply.dto.OrderResponseDTO;
 import lk.ijse.NexaSupply.enumeration.OrderStatus;
@@ -17,5 +18,7 @@ public interface OrderService {
     List<OrderResponseDTO> getMyOrders();
 
     List<OrderResponseDTO> getAllOrders();
+
+    OrderInvoiceReportDTO getOrderInvoiceReportData(String orderCode);
 
 }
