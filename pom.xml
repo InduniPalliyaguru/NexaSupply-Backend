@@ -11,8 +11,8 @@
     <groupId>lk.ijse</groupId>
     <artifactId>NexaSupply</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name/>
-    <description/>
+    <name>NexaSupply-Backend</name>
+    <description>NexaSupply Distribution Backend Service</description>
     <url/>
     <licenses>
         <license/>
