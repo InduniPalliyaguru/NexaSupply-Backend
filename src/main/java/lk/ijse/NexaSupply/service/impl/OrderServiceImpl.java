@@ -179,7 +179,6 @@ public class OrderServiceImpl implements OrderService {
 
         order.setOrderStatus(status);
         Order savedOrder = orderRepository.save(order);
-        System.out.println("Pay COde" + savedOrder.getPayment().getPaymentCode());
 
         if (status == OrderStatus.APPROVED) {
             sendInvoiceEmail(savedOrder);
