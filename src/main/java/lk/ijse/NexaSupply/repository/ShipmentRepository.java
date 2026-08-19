@@ -1,5 +1,6 @@
 package lk.ijse.NexaSupply.repository;
 
+import lk.ijse.NexaSupply.entity.Order;
 import lk.ijse.NexaSupply.entity.Shipment;
 import lk.ijse.NexaSupply.enumeration.ShipmentStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -26,6 +27,8 @@ public interface ShipmentRepository extends JpaRepository<Shipment, Long> {
 
     @Query("SELECT s FROM Shipment s WHERE s.driver.driverCode = ?1 AND s.dataStatus = 'ACTIVE'")
     List<Shipment> findByDriverCodeActive(String driverCode);
+
+    Optional<Shipment> findByOrder(Order order);
 
     @Query("SELECT COUNT(s) FROM Shipment s")
     long countAllShipments();

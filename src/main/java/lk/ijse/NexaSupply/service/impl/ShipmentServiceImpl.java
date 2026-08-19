@@ -62,7 +62,15 @@ public class ShipmentServiceImpl implements ShipmentService {
             throw new CustomException(404, "Driver Not Found with Code: " + dto.getDriverCode());
         }
 
-        Shipment shipment = new Shipment();
+        Optional<Shipment> previousShipmentOptional = shipmentRepository.findByOrder(orderOptional.get());
+
+        Shipment shipment;
+        if (previousShipmentOptional.isPresent()) {
+            shipment = previousShipmentOptional.get();
+        } else {
+            shipment = new Shipment();
+        }
+
         shipment.setTrackingNumber(generateTrackingNumber());
         shipment.setStatus(ShipmentStatus.PENDING);
         shipment.setDataStatus(DataStatus.ACTIVE);
