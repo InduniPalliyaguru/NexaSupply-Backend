@@ -210,15 +210,8 @@ public class UserServiceImpl implements UserService {
             throw new CustomException(404, "User not found with email: " + email);
         }
         User user = active.get();
-        UserResponseDTO userDTO = new UserResponseDTO();
-        userDTO.setUserCode(user.getUserCode());
-        userDTO.setFullName(user.getFullName());
-        userDTO.setEmail(user.getEmail());
-        userDTO.setPhone(user.getPhone());
-        userDTO.setAddress(user.getAddress());
-        userDTO.setCreditLimit(user.getCreditLimit());
 
-        return userDTO;
+        return mapToUserResponse(user);
     }
 
     @Override
