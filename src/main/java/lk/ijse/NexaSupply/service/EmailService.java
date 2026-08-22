@@ -10,4 +10,6 @@ public interface EmailService {
 
     void sendShipmentStatusUpdateEmail(String toEmail, String customerName, String orderCode, String trackingNumber, String driverName, String driverPhone, String status);
 
+    void sendOtpEmail(String toEmail, String otpCode);
+
 }

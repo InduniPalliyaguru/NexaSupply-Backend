@@ -171,4 +171,40 @@ public class EmailServiceImpl implements EmailService {
         }
 
     }
+
+    @Async
+    @Override
+    public void sendOtpEmail(String toEmail, String otpCode) {
+        log.info("Sending OTP email to {}", toEmail);
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setTo(toEmail);
+            helper.setSubject("🔒 Password Reset Verification Code - NexaSupply");
+
+            String htmlContent = "<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e8d5ea; border-radius: 8px; padding: 25px; background-color: #ffffff;'>"
+                    + "<h2 style='color: #3b0a45; text-align: center; margin-bottom: 20px;'>Password Reset Request 🔑</h2>"
+                    + "<p style='color: #333333; font-size: 15px;'>Hello,</p>"
+                    + "<p style='color: #555555; line-height: 1.5;'>We received a request to reset your password for your NexaSupply account. Use the OTP code below to proceed:</p>"
+
+                    + "<div style='background-color: #faf2fc; border-left: 4px solid #6f2c91; padding: 20px; margin: 20px 0; border-radius: 6px; text-align: center;'>"
+                    + "<h4 style='margin: 0 0 10px 0; color: #4a005b; text-transform: uppercase; letter-spacing: 0.5px;'>Your One-Time Password (OTP)</h4>"
+                    + "<div style='font-size: 32px; font-weight: bold; color: #6f2c91; letter-spacing: 6px; margin: 10px 0;'>" + otpCode + "</div>"
+                    + "<p style='margin: 5px 0 0 0; color: #777777; font-size: 13px;'>This code is valid for <b>5 minutes</b>.</p>"
+                    + "</div>"
+
+                    + "<p style='color: #555555; line-height: 1.5;'>If you did not request a password reset, please ignore this email or contact support if you have concerns.</p>"
+                    + "<br/>"
+                    + "<p style='color: #333333; margin: 0;'>Best Regards,<br/><b style='color: #4a005b;'>NexaSupply Security Team</b></p>"
+                    + "</div>";
+
+            helper.setText(htmlContent, true);
+            mailSender.send(message);
+            log.info("Password reset OTP email sent successfully to {}", toEmail);
+        } catch (Exception e) {
+            log.error("Failed to send OTP email to {}: {}", toEmail, e.getMessage());
+            throw new CustomException(500, "Email sending failed. Please try again later.");
+        }
+    }
 }

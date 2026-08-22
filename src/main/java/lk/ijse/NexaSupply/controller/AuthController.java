@@ -1,10 +1,7 @@
 package lk.ijse.NexaSupply.controller;
 
 import lk.ijse.NexaSupply.constant.CommonResponse;
-import lk.ijse.NexaSupply.dto.LoginRequestDTO;
-import lk.ijse.NexaSupply.dto.RegisterRequestDTO;
-import lk.ijse.NexaSupply.dto.UserDTO;
-import lk.ijse.NexaSupply.dto.UserDataDTO;
+import lk.ijse.NexaSupply.dto.*;
 import lk.ijse.NexaSupply.security.JwtUtil;
 import lk.ijse.NexaSupply.service.AuditLogService;
 import lk.ijse.NexaSupply.service.UserService;
@@ -50,6 +47,24 @@ public class AuthController {
 
         auditLogService.logAction(userDetails.getEmail(), "USER_LOGIN_SUCCESS");
         return new CommonResponse(200, userDataDTO, "Login successfully!");
+    }
+
+    @PostMapping(value = "/forgot-password", produces = MediaType.APPLICATION_JSON_VALUE)
+    public CommonResponse sendForgotPasswordOtp(@Valid @RequestBody ForgotPasswordRequestDTO dto) {
+        userService.sendForgotPasswordOtp(dto);
+        return new CommonResponse(200, "OTP sent successfully to your email!", "Success");
+    }
+
+    @PostMapping(value = "/verify-otp", produces = MediaType.APPLICATION_JSON_VALUE)
+    public CommonResponse verifyOtp(@Valid @RequestBody VerifyOtpRequestDTO dto) {
+        boolean isValid = userService.verifyOtp(dto);
+        return new CommonResponse(200, isValid, "OTP verified successfully!");
+    }
+
+    @PostMapping(value = "/reset-password", produces = MediaType.APPLICATION_JSON_VALUE)
+    public CommonResponse resetPassword(@Valid @RequestBody ResetPasswordRequestDTO dto) {
+        userService.resetPassword(dto);
+        return new CommonResponse(200, "Password reset successfully!");
     }
 
 }

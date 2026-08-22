@@ -1,12 +1,14 @@
 package lk.ijse.NexaSupply.service.impl;
 
 import lk.ijse.NexaSupply.dto.*;
+import lk.ijse.NexaSupply.entity.PasswordResetOtp;
 import lk.ijse.NexaSupply.entity.User;
 import lk.ijse.NexaSupply.enumeration.DataStatus;
 import lk.ijse.NexaSupply.enumeration.LedgerType;
 import lk.ijse.NexaSupply.enumeration.ProfileStatus;
 import lk.ijse.NexaSupply.enumeration.Role;
 import lk.ijse.NexaSupply.exception.CustomException;
+import lk.ijse.NexaSupply.repository.PasswordResetOtpRepository;
 import lk.ijse.NexaSupply.repository.UserRepository;
 import lk.ijse.NexaSupply.service.AuditLogService;
 import lk.ijse.NexaSupply.service.CreditLedgerService;
@@ -19,10 +21,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 @Slf4j
@@ -35,6 +39,7 @@ public class UserServiceImpl implements UserService {
     private final AuditLogService auditLogService;
     private final CreditLedgerService creditLedgerService;
     private final EmailService emailService;
+    private final PasswordResetOtpRepository passwordResetOtpRepository;
 
     @Override
     public void registerRetailer(RegisterRequestDTO request) {
@@ -267,6 +272,71 @@ public class UserServiceImpl implements UserService {
         User updateUser = userRepository.save(user);
 
         return mapToUserResponse(updateUser);
+    }
+
+    @Override
+    public void sendForgotPasswordOtp(ForgotPasswordRequestDTO dto) {
+        log.info("Execute Send Forgot Password Otp method");
+
+        Optional<User> activeByEmail = userRepository.findActiveByEmail(dto.getEmail());
+        if (activeByEmail.isEmpty()) {
+            throw new CustomException(404, "User not found with email: " + dto.getEmail());
+        }
+        User user = activeByEmail.get();
+
+        String otpCode = String.format("%06d", new Random().nextInt(900000) + 100000);
+
+        PasswordResetOtp resetOtp = new PasswordResetOtp();
+        resetOtp.setEmail(user.getEmail());
+        resetOtp.setOtpCode(otpCode);
+        resetOtp.setExpiryTime(LocalDateTime.now().plusMinutes(5));
+        resetOtp.setUsed(false);
+
+        passwordResetOtpRepository.save(resetOtp);
+
+        emailService.sendOtpEmail(user.getEmail(), otpCode);
+    }
+
+    @Override
+    public boolean verifyOtp(VerifyOtpRequestDTO dto) {
+        log.info("Execute Verify Otp method");
+
+        Optional<PasswordResetOtp> resetOtp = passwordResetOtpRepository.findTopByEmailAndOtpCodeAndIsUsedFalseOrderByExpiryTimeDesc(dto.getEmail(), dto.getOtpCode());
+        if (resetOtp.isEmpty()) {
+            throw new CustomException(404, "Invalid or expired OTP code");
+        }
+        PasswordResetOtp otp = resetOtp.get();
+
+        if (otp.getExpiryTime().isBefore(LocalDateTime.now())) {
+            throw new CustomException(404, "OTP code has expired. Please request a new one.");
+        }
+        return true;
+    }
+
+    @Override
+    public void resetPassword(ResetPasswordRequestDTO dto) {
+        log.info("Execute Reset Password method");
+
+        Optional<PasswordResetOtp> resetOtp = passwordResetOtpRepository.findTopByEmailAndOtpCodeAndIsUsedFalseOrderByExpiryTimeDesc(dto.getEmail(), dto.getOtpCode());
+        if (resetOtp.isEmpty()) {
+            throw new CustomException(404, "Invalid or expired OTP code");
+        }
+        PasswordResetOtp otp = resetOtp.get();
+
+        if (otp.getExpiryTime().isBefore(LocalDateTime.now())) {
+            throw new CustomException(404, "OTP code has expired. Please request a new one.");
+        }
+
+        Optional<User> activeByEmail = userRepository.findActiveByEmail(dto.getEmail());
+        if (activeByEmail.isEmpty()) {
+            throw new CustomException(404, "User not found with email: " + dto.getEmail());
+        }
+        User user = activeByEmail.get();
+        user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+        userRepository.save(user);
+
+        otp.setUsed(true);
+        passwordResetOtpRepository.save(otp);
     }
 
     private UserResponseDTO mapToUserResponse(User user) {

@@ -1,9 +1,6 @@
 package lk.ijse.NexaSupply.service;
 
-import lk.ijse.NexaSupply.dto.RegisterRequestDTO;
-import lk.ijse.NexaSupply.dto.UpdateProfileDTO;
-import lk.ijse.NexaSupply.dto.UserDTO;
-import lk.ijse.NexaSupply.dto.UserResponseDTO;
+import lk.ijse.NexaSupply.dto.*;
 import lk.ijse.NexaSupply.enumeration.Role;
 
 import java.util.List;
@@ -35,5 +32,11 @@ public interface UserService {
     void deleteUser(String userCode);
 
     UserResponseDTO updateProfile(String email, UpdateProfileDTO updateProfileDTO);
+
+    void sendForgotPasswordOtp(ForgotPasswordRequestDTO dto);
+
+    boolean verifyOtp(VerifyOtpRequestDTO dto);
+
+    void resetPassword(ResetPasswordRequestDTO dto);
 
 }
