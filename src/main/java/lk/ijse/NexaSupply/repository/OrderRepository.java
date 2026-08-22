@@ -28,7 +28,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query("SELECT COALESCE(SUM(o.totalPrice), 0.0) FROM Order o WHERE o.orderStatus != 'CANCELLED'")
     double sumTotalRevenue();
 
-    @Query("SELECT new lk.ijse.NexaSupply.dto.MonthlySalesDTO(" +
+    @Query("SELECT new lk.ijse.NexaSupply.dto.dashboard.MonthlySalesDTO(" +
             "FUNCTION('DATE_FORMAT', o.orderDate, '%Y-%b'), " +
             "COALESCE(SUM(o.totalPrice), 0.0)) " +
             "FROM Order o " +
