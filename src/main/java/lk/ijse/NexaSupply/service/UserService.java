@@ -1,6 +1,6 @@
 package lk.ijse.NexaSupply.service;
 
-import lk.ijse.NexaSupply.dto.*;
+import lk.ijse.NexaSupply.dto.auth.*;
 import lk.ijse.NexaSupply.enumeration.Role;
 
 import java.util.List;

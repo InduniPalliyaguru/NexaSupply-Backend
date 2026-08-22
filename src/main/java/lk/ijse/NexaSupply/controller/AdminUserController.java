@@ -2,8 +2,8 @@ package lk.ijse.NexaSupply.controller;
 
 import jakarta.validation.Valid;
 import lk.ijse.NexaSupply.constant.CommonResponse;
-import lk.ijse.NexaSupply.dto.RegisterRequestDTO;
-import lk.ijse.NexaSupply.dto.UserResponseDTO;
+import lk.ijse.NexaSupply.dto.auth.RegisterRequestDTO;
+import lk.ijse.NexaSupply.dto.auth.UserResponseDTO;
 import lk.ijse.NexaSupply.enumeration.Role;
 import lk.ijse.NexaSupply.service.UserService;
 import lombok.RequiredArgsConstructor;

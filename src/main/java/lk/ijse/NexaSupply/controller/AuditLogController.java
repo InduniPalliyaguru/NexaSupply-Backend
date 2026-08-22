@@ -1,7 +1,7 @@
 package lk.ijse.NexaSupply.controller;
 
 import lk.ijse.NexaSupply.constant.CommonResponse;
-import lk.ijse.NexaSupply.dto.AuditLogDTO;
+import lk.ijse.NexaSupply.dto.system.AuditLogDTO;
 import lk.ijse.NexaSupply.service.AuditLogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;

@@ -1,7 +1,7 @@
 package lk.ijse.NexaSupply.controller;
 
 import lk.ijse.NexaSupply.constant.CommonResponse;
-import lk.ijse.NexaSupply.dto.*;
+import lk.ijse.NexaSupply.dto.auth.*;
 import lk.ijse.NexaSupply.security.JwtUtil;
 import lk.ijse.NexaSupply.service.AuditLogService;
 import lk.ijse.NexaSupply.service.UserService;

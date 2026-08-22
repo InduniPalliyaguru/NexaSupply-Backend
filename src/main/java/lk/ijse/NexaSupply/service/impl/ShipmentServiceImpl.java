@@ -1,7 +1,7 @@
 package lk.ijse.NexaSupply.service.impl;
 
-import lk.ijse.NexaSupply.dto.ShipmentRequestDTO;
-import lk.ijse.NexaSupply.dto.ShipmentResponseDTO;
+import lk.ijse.NexaSupply.dto.shipment.ShipmentRequestDTO;
+import lk.ijse.NexaSupply.dto.shipment.ShipmentResponseDTO;
 import lk.ijse.NexaSupply.entity.Driver;
 import lk.ijse.NexaSupply.entity.Order;
 import lk.ijse.NexaSupply.entity.Shipment;

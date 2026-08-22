@@ -1,6 +1,6 @@
 package lk.ijse.NexaSupply.service.impl;
 
-import lk.ijse.NexaSupply.dto.OrderInvoiceReportDTO;
+import lk.ijse.NexaSupply.dto.report.OrderInvoiceReportDTO;
 import lk.ijse.NexaSupply.service.ReportService;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jasperreports.engine.*;

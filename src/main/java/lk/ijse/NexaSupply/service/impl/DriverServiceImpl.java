@@ -1,7 +1,7 @@
 package lk.ijse.NexaSupply.service.impl;
 
-import lk.ijse.NexaSupply.dto.DriverRequestDTO;
-import lk.ijse.NexaSupply.dto.DriverResponseDTO;
+import lk.ijse.NexaSupply.dto.driver.DriverRequestDTO;
+import lk.ijse.NexaSupply.dto.driver.DriverResponseDTO;
 import lk.ijse.NexaSupply.entity.Driver;
 import lk.ijse.NexaSupply.enumeration.DataStatus;
 import lk.ijse.NexaSupply.enumeration.DriverStatus;

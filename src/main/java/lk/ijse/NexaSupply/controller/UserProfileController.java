@@ -2,8 +2,8 @@ package lk.ijse.NexaSupply.controller;
 
 import jakarta.validation.Valid;
 import lk.ijse.NexaSupply.constant.CommonResponse;
-import lk.ijse.NexaSupply.dto.UpdateProfileDTO;
-import lk.ijse.NexaSupply.dto.UserResponseDTO;
+import lk.ijse.NexaSupply.dto.auth.UpdateProfileDTO;
+import lk.ijse.NexaSupply.dto.auth.UserResponseDTO;
 import lk.ijse.NexaSupply.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;

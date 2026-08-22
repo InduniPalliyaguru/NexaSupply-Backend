@@ -1,7 +1,7 @@
 package lk.ijse.NexaSupply.service;
 
-import lk.ijse.NexaSupply.dto.PaymentDTO;
-import lk.ijse.NexaSupply.dto.PaymentProcessDTO;
+import lk.ijse.NexaSupply.dto.payment.PaymentDTO;
+import lk.ijse.NexaSupply.dto.payment.PaymentProcessDTO;
 import lk.ijse.NexaSupply.entity.Order;
 import lk.ijse.NexaSupply.entity.Payment;
 

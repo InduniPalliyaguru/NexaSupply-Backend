@@ -1,9 +1,9 @@
 package lk.ijse.NexaSupply.service.impl;
 
-import lk.ijse.NexaSupply.dto.AdminDashboardDTO;
-import lk.ijse.NexaSupply.dto.MonthlySalesDTO;
-import lk.ijse.NexaSupply.dto.RecentOrderDTO;
-import lk.ijse.NexaSupply.dto.RetailerDashboardDTO;
+import lk.ijse.NexaSupply.dto.dashboard.AdminDashboardDTO;
+import lk.ijse.NexaSupply.dto.dashboard.MonthlySalesDTO;
+import lk.ijse.NexaSupply.dto.dashboard.RecentOrderDTO;
+import lk.ijse.NexaSupply.dto.dashboard.RetailerDashboardDTO;
 import lk.ijse.NexaSupply.entity.Order;
 import lk.ijse.NexaSupply.entity.User;
 import lk.ijse.NexaSupply.enumeration.DataStatus;

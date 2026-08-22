@@ -1,6 +1,6 @@
 package lk.ijse.NexaSupply.service.impl;
 
-import lk.ijse.NexaSupply.dto.SupplierDTO;
+import lk.ijse.NexaSupply.dto.supplier.SupplierDTO;
 import lk.ijse.NexaSupply.entity.Supplier;
 import lk.ijse.NexaSupply.enumeration.DataStatus;
 import lk.ijse.NexaSupply.exception.CustomException;

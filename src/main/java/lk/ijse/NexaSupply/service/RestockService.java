@@ -1,7 +1,7 @@
 package lk.ijse.NexaSupply.service;
 
-import lk.ijse.NexaSupply.dto.RestockRequestDTO;
-import lk.ijse.NexaSupply.dto.RestockResponseDTO;
+import lk.ijse.NexaSupply.dto.restock.RestockRequestDTO;
+import lk.ijse.NexaSupply.dto.restock.RestockResponseDTO;
 
 import java.util.List;
 

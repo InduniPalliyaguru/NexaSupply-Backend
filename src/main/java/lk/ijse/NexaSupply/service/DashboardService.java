@@ -1,7 +1,7 @@
 package lk.ijse.NexaSupply.service;
 
-import lk.ijse.NexaSupply.dto.AdminDashboardDTO;
-import lk.ijse.NexaSupply.dto.RetailerDashboardDTO;
+import lk.ijse.NexaSupply.dto.dashboard.AdminDashboardDTO;
+import lk.ijse.NexaSupply.dto.dashboard.RetailerDashboardDTO;
 
 public interface DashboardService {
 

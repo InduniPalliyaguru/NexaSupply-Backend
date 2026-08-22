@@ -1,6 +1,6 @@
 package lk.ijse.NexaSupply.repository;
 
-import lk.ijse.NexaSupply.dto.MonthlySalesDTO;
+import lk.ijse.NexaSupply.dto.dashboard.MonthlySalesDTO;
 import lk.ijse.NexaSupply.entity.Order;
 import lk.ijse.NexaSupply.enumeration.OrderStatus;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,6 +1,6 @@
 package lk.ijse.NexaSupply.service;
 
-import lk.ijse.NexaSupply.dto.CategoryDTO;
+import lk.ijse.NexaSupply.dto.product.CategoryDTO;
 
 import java.util.List;
 

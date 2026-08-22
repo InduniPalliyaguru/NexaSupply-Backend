@@ -1,6 +1,6 @@
 package lk.ijse.NexaSupply.service;
 
-import lk.ijse.NexaSupply.dto.CreditLedgerDTO;
+import lk.ijse.NexaSupply.dto.payment.CreditLedgerDTO;
 
 import java.util.List;
 

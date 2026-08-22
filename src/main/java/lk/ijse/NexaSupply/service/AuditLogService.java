@@ -1,6 +1,6 @@
 package lk.ijse.NexaSupply.service;
 
-import lk.ijse.NexaSupply.dto.AuditLogDTO;
+import lk.ijse.NexaSupply.dto.system.AuditLogDTO;
 
 import java.util.List;
 

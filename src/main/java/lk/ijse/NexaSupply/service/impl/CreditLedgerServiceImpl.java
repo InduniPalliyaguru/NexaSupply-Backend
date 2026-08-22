@@ -1,6 +1,6 @@
 package lk.ijse.NexaSupply.service.impl;
 
-import lk.ijse.NexaSupply.dto.CreditLedgerDTO;
+import lk.ijse.NexaSupply.dto.payment.CreditLedgerDTO;
 import lk.ijse.NexaSupply.entity.CreditLedger;
 import lk.ijse.NexaSupply.entity.User;
 import lk.ijse.NexaSupply.enumeration.DataStatus;

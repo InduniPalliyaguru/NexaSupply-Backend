@@ -1,7 +1,7 @@
 package lk.ijse.NexaSupply.service.impl;
 
-import lk.ijse.NexaSupply.dto.ProductRequestDTO;
-import lk.ijse.NexaSupply.dto.ProductResponseDTO;
+import lk.ijse.NexaSupply.dto.product.ProductRequestDTO;
+import lk.ijse.NexaSupply.dto.product.ProductResponseDTO;
 import lk.ijse.NexaSupply.entity.Category;
 import lk.ijse.NexaSupply.entity.Product;
 import lk.ijse.NexaSupply.enumeration.DataStatus;

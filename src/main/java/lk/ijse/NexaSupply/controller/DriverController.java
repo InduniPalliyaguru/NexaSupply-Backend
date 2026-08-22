@@ -2,8 +2,8 @@ package lk.ijse.NexaSupply.controller;
 
 import jakarta.validation.Valid;
 import lk.ijse.NexaSupply.constant.CommonResponse;
-import lk.ijse.NexaSupply.dto.DriverRequestDTO;
-import lk.ijse.NexaSupply.dto.DriverResponseDTO;
+import lk.ijse.NexaSupply.dto.driver.DriverRequestDTO;
+import lk.ijse.NexaSupply.dto.driver.DriverResponseDTO;
 import lk.ijse.NexaSupply.enumeration.DriverStatus;
 import lk.ijse.NexaSupply.service.DriverService;
 import lombok.RequiredArgsConstructor;

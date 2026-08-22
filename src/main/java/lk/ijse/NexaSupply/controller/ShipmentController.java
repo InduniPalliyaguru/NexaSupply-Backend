@@ -2,8 +2,8 @@ package lk.ijse.NexaSupply.controller;
 
 import jakarta.validation.Valid;
 import lk.ijse.NexaSupply.constant.CommonResponse;
-import lk.ijse.NexaSupply.dto.ShipmentRequestDTO;
-import lk.ijse.NexaSupply.dto.ShipmentResponseDTO;
+import lk.ijse.NexaSupply.dto.shipment.ShipmentRequestDTO;
+import lk.ijse.NexaSupply.dto.shipment.ShipmentResponseDTO;
 import lk.ijse.NexaSupply.enumeration.ShipmentStatus;
 import lk.ijse.NexaSupply.service.ShipmentService;
 import lombok.RequiredArgsConstructor;

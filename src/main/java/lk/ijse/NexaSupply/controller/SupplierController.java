@@ -2,7 +2,7 @@ package lk.ijse.NexaSupply.controller;
 
 import jakarta.validation.Valid;
 import lk.ijse.NexaSupply.constant.CommonResponse;
-import lk.ijse.NexaSupply.dto.SupplierDTO;
+import lk.ijse.NexaSupply.dto.supplier.SupplierDTO;
 import lk.ijse.NexaSupply.service.SupplierService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;

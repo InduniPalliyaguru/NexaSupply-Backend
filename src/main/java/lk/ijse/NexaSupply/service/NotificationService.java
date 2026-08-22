@@ -1,6 +1,6 @@
 package lk.ijse.NexaSupply.service;
 
-import lk.ijse.NexaSupply.dto.NotificationDTO;
+import lk.ijse.NexaSupply.dto.system.NotificationDTO;
 import lk.ijse.NexaSupply.entity.User;
 
 import java.util.List;

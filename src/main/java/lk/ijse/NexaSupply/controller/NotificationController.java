@@ -1,7 +1,7 @@
 package lk.ijse.NexaSupply.controller;
 
 import lk.ijse.NexaSupply.constant.CommonResponse;
-import lk.ijse.NexaSupply.dto.NotificationDTO;
+import lk.ijse.NexaSupply.dto.system.NotificationDTO;
 import lk.ijse.NexaSupply.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;

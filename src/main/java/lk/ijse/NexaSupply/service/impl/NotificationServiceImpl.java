@@ -1,6 +1,6 @@
 package lk.ijse.NexaSupply.service.impl;
 
-import lk.ijse.NexaSupply.dto.NotificationDTO;
+import lk.ijse.NexaSupply.dto.system.NotificationDTO;
 import lk.ijse.NexaSupply.entity.Notification;
 import lk.ijse.NexaSupply.entity.User;
 import lk.ijse.NexaSupply.enumeration.DataStatus;

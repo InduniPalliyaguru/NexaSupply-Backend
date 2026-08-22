@@ -2,9 +2,9 @@ package lk.ijse.NexaSupply.controller;
 
 import jakarta.validation.Valid;
 import lk.ijse.NexaSupply.constant.CommonResponse;
-import lk.ijse.NexaSupply.dto.OrderInvoiceReportDTO;
-import lk.ijse.NexaSupply.dto.OrderRequestDTO;
-import lk.ijse.NexaSupply.dto.OrderResponseDTO;
+import lk.ijse.NexaSupply.dto.report.OrderInvoiceReportDTO;
+import lk.ijse.NexaSupply.dto.order.OrderRequestDTO;
+import lk.ijse.NexaSupply.dto.order.OrderResponseDTO;
 import lk.ijse.NexaSupply.enumeration.OrderStatus;
 import lk.ijse.NexaSupply.service.OrderService;
 import lk.ijse.NexaSupply.service.ReportService;

@@ -1,7 +1,7 @@
 package lk.ijse.NexaSupply.service;
 
-import lk.ijse.NexaSupply.dto.ShipmentRequestDTO;
-import lk.ijse.NexaSupply.dto.ShipmentResponseDTO;
+import lk.ijse.NexaSupply.dto.shipment.ShipmentRequestDTO;
+import lk.ijse.NexaSupply.dto.shipment.ShipmentResponseDTO;
 import lk.ijse.NexaSupply.enumeration.ShipmentStatus;
 
 import java.util.List;

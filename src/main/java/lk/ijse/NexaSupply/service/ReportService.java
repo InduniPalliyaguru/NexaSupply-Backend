@@ -1,6 +1,6 @@
 package lk.ijse.NexaSupply.service;
 
-import lk.ijse.NexaSupply.dto.OrderInvoiceReportDTO;
+import lk.ijse.NexaSupply.dto.report.OrderInvoiceReportDTO;
 
 public interface ReportService {
 

@@ -1,7 +1,7 @@
 package lk.ijse.NexaSupply.controller;
 
 import lk.ijse.NexaSupply.constant.CommonResponse;
-import lk.ijse.NexaSupply.dto.CreditLedgerDTO;
+import lk.ijse.NexaSupply.dto.payment.CreditLedgerDTO;
 import lk.ijse.NexaSupply.service.CreditLedgerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;

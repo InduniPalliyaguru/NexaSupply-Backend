@@ -1,8 +1,8 @@
 package lk.ijse.NexaSupply.controller;
 
 import lk.ijse.NexaSupply.constant.CommonResponse;
-import lk.ijse.NexaSupply.dto.AdminDashboardDTO;
-import lk.ijse.NexaSupply.dto.RetailerDashboardDTO;
+import lk.ijse.NexaSupply.dto.dashboard.AdminDashboardDTO;
+import lk.ijse.NexaSupply.dto.dashboard.RetailerDashboardDTO;
 import lk.ijse.NexaSupply.service.DashboardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;

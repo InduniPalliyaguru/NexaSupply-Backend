@@ -2,8 +2,8 @@ package lk.ijse.NexaSupply.controller;
 
 import jakarta.validation.Valid;
 import lk.ijse.NexaSupply.constant.CommonResponse;
-import lk.ijse.NexaSupply.dto.PaymentDTO;
-import lk.ijse.NexaSupply.dto.PaymentProcessDTO;
+import lk.ijse.NexaSupply.dto.payment.PaymentDTO;
+import lk.ijse.NexaSupply.dto.payment.PaymentProcessDTO;
 import lk.ijse.NexaSupply.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;

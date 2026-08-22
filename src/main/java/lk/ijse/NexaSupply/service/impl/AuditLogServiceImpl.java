@@ -1,6 +1,6 @@
 package lk.ijse.NexaSupply.service.impl;
 
-import lk.ijse.NexaSupply.dto.AuditLogDTO;
+import lk.ijse.NexaSupply.dto.system.AuditLogDTO;
 import lk.ijse.NexaSupply.entity.AuditLog;
 import lk.ijse.NexaSupply.repository.AuditLogRepository;
 import lk.ijse.NexaSupply.service.AuditLogService;
