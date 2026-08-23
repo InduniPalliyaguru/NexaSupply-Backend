@@ -1,4 +1,4 @@
-package lk.ijse.NexaSupply.dto;
+package lk.ijse.NexaSupply.dto.chatbot;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ChatRequestDTO {
+public class ChatResponseDTO {
 
-    private String message;
+    private String reply;
 
 }
