@@ -1,6 +1,7 @@
 package lk.ijse.NexaSupply.entity;
 
 import jakarta.persistence.*;
+import lk.ijse.NexaSupply.enumeration.Role;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,7 +22,7 @@ public class ChatLog {
     private String userEmail;
 
     @Column(nullable = false)
-    private String userRole;
+    private Role userRole;
 
     @Column(columnDefinition = "TEXT", nullable = false)
     private String userPrompt;
