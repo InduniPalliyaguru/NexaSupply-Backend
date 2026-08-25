@@ -17,12 +17,14 @@ import lk.ijse.NexaSupply.service.RestockService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class AiToolServiceImpl implements AiToolsService {
 
     private final DashboardService dashboardService;
@@ -116,40 +118,68 @@ public class AiToolServiceImpl implements AiToolsService {
     }
 
     @Override
-    public OrderInvoiceReportDTO getOrderDetailsAndStatus(String orderCode) {
-        log.info("AI Tool Executing: getOrderDetailsAndStatus for: {}", orderCode);
+    public OrderInvoiceReportDTO getOrderDetailsAndStatus(String orderCodeOrQuery) {
+        log.info("AI Tool Executing: getOrderDetailsAndStatus for query: {}", orderCodeOrQuery);
 
-        Optional<Order> orderOpt = orderRepository.findByOrderCode(orderCode);
-        if (orderOpt.isPresent()) {
-            Order order = orderOpt.get();
+        if (orderCodeOrQuery == null || orderCodeOrQuery.trim().isEmpty()) {
+            return null;
+        }
+
+        List<Order> allOrders = orderRepository.findAll();
+        Order matchedOrder = null;
+
+        for (Order o : allOrders) {
+            if (o.getOrderCode() != null && orderCodeOrQuery.toLowerCase().contains(o.getOrderCode().toLowerCase())) {
+                matchedOrder = o;
+                break;
+            }
+        }
+
+        if (matchedOrder == null) {
+            Optional<Order> orderOpt = orderRepository.findByOrderCode(orderCodeOrQuery.trim());
+            if (orderOpt.isPresent()) {
+                matchedOrder = orderOpt.get();
+            }
+        }
+
+        if (matchedOrder != null) {
             OrderInvoiceReportDTO report = new OrderInvoiceReportDTO();
-            report.setOrderCode(order.getOrderCode());
-            report.setOrderDate(order.getOrderDate() != null ? order.getOrderDate().toString() : "N/A");
-            report.setOrderStatus(order.getOrderStatus().name());
+            report.setOrderCode(matchedOrder.getOrderCode());
+            report.setOrderDate(matchedOrder.getOrderDate() != null ? matchedOrder.getOrderDate().toString() : "N/A");
+            report.setOrderStatus(matchedOrder.getOrderStatus() != null ? matchedOrder.getOrderStatus().name() : "N/A");
 
-            if (order.getCustomer() != null) {
-                report.setCustomerName(order.getCustomer().getFullName());
-                report.setShopName(order.getCustomer().getShopName());
-                report.setCustomerEmail(order.getCustomer().getEmail());
-                report.setCustomerPhone(order.getCustomer().getPhone());
+            if (matchedOrder.getCustomer() != null) {
+                report.setCustomerName(matchedOrder.getCustomer().getFullName());
+                report.setShopName(matchedOrder.getCustomer().getShopName());
+                report.setCustomerEmail(matchedOrder.getCustomer().getEmail());
+                report.setCustomerPhone(matchedOrder.getCustomer().getPhone());
             }
 
-            if (order.getPayment() != null) {
-                report.setPayCode(order.getPayment().getPaymentCode());
-                report.setPaymentStatus(order.getPayment().getPaymentStatus().name());
-                report.setGrandTotal(order.getPayment().getTotalAmount());
-                report.setPaidAmount(order.getPayment().getPaidAmount());
-                report.setBalanceAmount(order.getPayment().getBalanceAmount());
+            if (matchedOrder.getPayment() != null) {
+                report.setPayCode(matchedOrder.getPayment().getPaymentCode());
+                report.setPaymentStatus(matchedOrder.getPayment().getPaymentStatus() != null ? matchedOrder.getPayment().getPaymentStatus().name() : "N/A");
+
+                double grandTotal = matchedOrder.getPayment().getTotalAmount() != null ? matchedOrder.getPayment().getTotalAmount() : 0.0;
+                double paidAmount = matchedOrder.getPayment().getPaidAmount();
+                double balanceAmount = matchedOrder.getPayment().getBalanceAmount();
+
+                report.setGrandTotal(grandTotal);
+                report.setPaidAmount(paidAmount);
+                report.setBalanceAmount(balanceAmount);
             }
 
             List<OrderItemReportDTO> itemList = new ArrayList<>();
-            if (order.getOrderProductList() != null) {
-                for (OrderProduct od : order.getOrderProductList()) {
-                    OrderItemReportDTO itemDTO = new lk.ijse.NexaSupply.dto.report.OrderItemReportDTO();
+            if (matchedOrder.getOrderProductList() != null && !matchedOrder.getOrderProductList().isEmpty()) {
+                for (OrderProduct od : matchedOrder.getOrderProductList()) {
+                    OrderItemReportDTO itemDTO = new OrderItemReportDTO();
                     itemDTO.setProductName(od.getProduct() != null ? od.getProduct().getName() : "N/A");
-                    itemDTO.setQuantity(od.getQuantity());
-                    itemDTO.setUnitPrice(od.getUnitPrice());
-                    itemDTO.setSubTotal(od.getQuantity() * od.getUnitPrice());
+
+                    int qty = od.getQuantity();
+                    double unitPrice = od.getUnitPrice();
+
+                    itemDTO.setQuantity(qty);
+                    itemDTO.setUnitPrice(unitPrice);
+                    itemDTO.setSubTotal(qty * unitPrice);
                     itemList.add(itemDTO);
                 }
             }
@@ -157,6 +187,7 @@ public class AiToolServiceImpl implements AiToolsService {
             return report;
         }
 
+        log.warn("No Order found matching prompt: {}", orderCodeOrQuery);
         return null;
     }
 
@@ -343,4 +374,25 @@ public class AiToolServiceImpl implements AiToolsService {
         }
         return resultMap;
     }
+
+    @Override
+    public List<ProductResponseDTO> getAllProductsList() {
+        log.info("AI Tool Executing: getAllProductsList");
+
+        List<Product> activeProducts = productRepository.findAllActiveProducts();
+        List<ProductResponseDTO> dtoList = new ArrayList<>();
+
+        for (Product p : activeProducts) {
+            ProductResponseDTO dto = new ProductResponseDTO();
+            dto.setProductCode(p.getProductCode());
+            dto.setProductName(p.getName());
+            dto.setUnitPrice(p.getUnitPrice());
+            dto.setAvailableQty(p.getQuantity());
+            dto.setCategoryName(p.getCategory() != null ? p.getCategory().getName() : "N/A");
+            dtoList.add(dto);
+        }
+
+        return dtoList;
+    }
+
 }

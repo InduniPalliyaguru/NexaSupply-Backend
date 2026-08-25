@@ -6,6 +6,7 @@ import lk.ijse.NexaSupply.dto.chatbot.ChatResponseDTO;
 import lk.ijse.NexaSupply.dto.dashboard.AdminDashboardDTO;
 import lk.ijse.NexaSupply.dto.product.ProductResponseDTO;
 import lk.ijse.NexaSupply.dto.report.OrderInvoiceReportDTO;
+import lk.ijse.NexaSupply.dto.report.OrderItemReportDTO;
 import lk.ijse.NexaSupply.dto.restock.RestockResponseDTO;
 import lk.ijse.NexaSupply.dto.shipment.ShipmentResponseDTO;
 import lk.ijse.NexaSupply.entity.ChatLog;
@@ -54,8 +55,9 @@ public class ChatServiceImpl implements ChatService {
                         "--- ACCESSIBLE REAL-TIME SYSTEM CONTEXT ---\n%s\n-------------------\n\n" +
                         "Strict Instructions:\n" +
                         "1. Answer ONLY using the provided database context above.\n" +
-                        "2. If the user asks for information outside their role's scope or context, politely state that they do not have permission to view those details.\n" +
-                        "3. Provide accurate, clear, and professional answers.",
+                        "2. ALWAYS use 'LKR' or 'Rs.' as the currency symbol for prices, credit limits, balances, and totals. NEVER use '$' or USD.\n" + // <-- මේ Rule එක එකතු කරන්න
+                        "3. If the user asks for information outside their role's scope or context, politely state that they do not have permission to view those details.\n" +
+                        "4. Provide accurate, clear, and professional answers.",
                 userRole, userEmail, dbContext
         );
 
@@ -127,6 +129,19 @@ public class ChatServiceImpl implements ChatService {
             }
         }
 
+        if (ChatIntent.PRODUCT_LIST.matches(userPrompt)) {
+            List<ProductResponseDTO> allProducts = aiToolsService.getAllProductsList();
+            if (allProducts != null && !allProducts.isEmpty()) {
+                context.append("--- ALL AVAILABLE PRODUCTS LIST ---\n");
+                for (ProductResponseDTO p : allProducts) {
+                    context.append(String.format("Code: %s | Name: %s | Price: LKR %.2f | Available Qty: %d | Category: %s\n",
+                            p.getProductCode(), p.getProductName(), p.getUnitPrice(),
+                            p.getAvailableQty(), p.getCategoryName()));
+                }
+                context.append("\n");
+            }
+        }
+
         if (ChatIntent.PRODUCT_INFO.matches(userPrompt)) {
             ProductResponseDTO productInfo = aiToolsService.getProductInformation(userPrompt);
             if (productInfo != null) {
@@ -151,9 +166,25 @@ public class ChatServiceImpl implements ChatService {
         if (ChatIntent.ORDER_DETAILS.matches(userPrompt)) {
             OrderInvoiceReportDTO orderDetails = aiToolsService.getOrderDetailsAndStatus(userPrompt);
             if (orderDetails != null) {
-                context.append("--- ORDER DETAILS ---\n");
-                context.append(String.format("Order Code: %s | Customer: %s | Status: %s | Date: %s\n\n",
-                        orderDetails.getOrderCode(), orderDetails.getCustomerName(), orderDetails.getOrderStatus(), orderDetails.getOrderDate()));
+                context.append("--- SPECIFIC ORDER DETAILS ---\n");
+                context.append(String.format("Order Code: %s\nCustomer: %s\nShop: %s\nStatus: %s\nDate: %s\nTotal: LKR %.2f\nPaid: LKR %.2f\nBalance: LKR %.2f\n",
+                        orderDetails.getOrderCode(),
+                        orderDetails.getCustomerName() != null ? orderDetails.getCustomerName() : "N/A",
+                        orderDetails.getShopName() != null ? orderDetails.getShopName() : "N/A",
+                        orderDetails.getOrderStatus(),
+                        orderDetails.getOrderDate(),
+                        orderDetails.getGrandTotal(),
+                        orderDetails.getPaidAmount(),
+                        orderDetails.getBalanceAmount()));
+
+                if (orderDetails.getItems() != null && !orderDetails.getItems().isEmpty()) {
+                    context.append("Ordered Items:\n");
+                    for (OrderItemReportDTO item : orderDetails.getItems()) {
+                        context.append(String.format("- Product: %s | Qty: %d | Price: LKR %.2f | SubTotal: LKR %.2f\n",
+                                item.getProductName(), item.getQuantity(), item.getUnitPrice(), item.getSubTotal()));
+                    }
+                }
+                context.append("\n");
             }
         }
 

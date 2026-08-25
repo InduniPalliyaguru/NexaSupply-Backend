@@ -4,9 +4,10 @@ import java.util.List;
 
 public enum ChatIntent {
     GLOBAL_SEARCH(List.of("search", "find", "all", "get", "show")),
+    PRODUCT_LIST(List.of("product list", "all products", "item list", "show products", "get products", "product catalog")),
     PRODUCT_INFO(List.of("product", "item", "price", "unit price", "qty", "quantity", "stock", "available")),
     CATEGORIES(List.of("category", "categories", "type", "types", "group")),
-    ORDER_DETAILS(List.of("order", "invoice", "buy", "purchase", "ord-")),
+    ORDER_DETAILS(List.of("order", "order details", "order status", "ord", "ord-", "details of order", "ORD")),
     SHIPMENT_TRACKING(List.of("track", "tracking", "shipment", "delivery", "dispatch", "driver name", "trk-")),
     USER_PROFILE(List.of("profile", "account", "my details", "shop", "user code")),
     NOTIFICATIONS(List.of("notification", "notifications", "alert", "alerts", "message", "messages")),

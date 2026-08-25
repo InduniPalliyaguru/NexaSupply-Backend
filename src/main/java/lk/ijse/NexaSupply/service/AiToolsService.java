@@ -37,4 +37,6 @@ public interface AiToolsService {
 
     Map<String, Object> searchSystemData(String searchQuery);
 
+    List<ProductResponseDTO> getAllProductsList();
+
 }
