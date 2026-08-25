@@ -1,10 +1,18 @@
 package lk.ijse.NexaSupply.service.impl;
 
+import lk.ijse.NexaSupply.dto.auth.UserResponseDTO;
 import lk.ijse.NexaSupply.dto.chatbot.ChatRequestDTO;
 import lk.ijse.NexaSupply.dto.chatbot.ChatResponseDTO;
+import lk.ijse.NexaSupply.dto.dashboard.AdminDashboardDTO;
+import lk.ijse.NexaSupply.dto.product.ProductResponseDTO;
+import lk.ijse.NexaSupply.dto.report.OrderInvoiceReportDTO;
+import lk.ijse.NexaSupply.dto.restock.RestockResponseDTO;
+import lk.ijse.NexaSupply.dto.shipment.ShipmentResponseDTO;
 import lk.ijse.NexaSupply.entity.ChatLog;
+import lk.ijse.NexaSupply.enumeration.DriverStatus;
 import lk.ijse.NexaSupply.enumeration.Role;
 import lk.ijse.NexaSupply.repository.ChatLogRepository;
+import lk.ijse.NexaSupply.service.AiToolsService;
 import lk.ijse.NexaSupply.service.ChatService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,32 +31,41 @@ import java.util.Map;
 public class ChatServiceImpl implements ChatService {
 
     private final ChatLogRepository chatLogRepository;
+    private final AiToolsService aiToolsService;
 
     @Value("${gemini.api.key}")
     private String apiKey;
 
     @Value("${gemini.api.url}")
-    private String baseUrl;
-
-    private static final String SYSTEM_PROMPT =
-            "You are NexaSupply AI Assistant. You MUST ONLY answer questions strictly related to " +
-                    "NexaSupply inventory management, products, orders, restocking, suppliers, and system features. " +
-                    "If the user asks about countries, sports, general knowledge, movies, or anything unrelated to NexaSupply, " +
-                    "decline politely by saying: 'I am NexaSupply AI Assistant. I can only answer questions related to NexaSupply inventory, orders, and services.'";
+    private String apiUrl;
 
     @Override
     public ChatResponseDTO processChat(ChatRequestDTO requestDTO, String userEmail, Role userRole) {
-        log.info("Execute processChat method");
+        log.info("Execute processChat method for user: {} | Role: {}", userEmail, userRole);
 
         String userPrompt = requestDTO.getMessage();
-        String apiUrl = baseUrl + "?key=" + apiKey;
+
+        String dbContext = buildRoleBasedContext(userEmail, userRole, userPrompt);
+
+        String dynamicSystemPrompt = String.format(
+                "You are NexaSupply AI Assistant. You MUST ONLY answer questions strictly related to NexaSupply system.\n" +
+                        "User Context -> Role: %s | Email: %s\n\n" +
+                        "--- ACCESSIBLE REAL-TIME SYSTEM CONTEXT ---\n%s\n-------------------\n\n" +
+                        "Strict Instructions:\n" +
+                        "1. Answer ONLY using the provided database context above.\n" +
+                        "2. If the user asks for information outside their role's scope or context, politely state that they do not have permission to view those details.\n" +
+                        "3. Provide accurate, clear, and professional answers.",
+                userRole, userEmail, dbContext
+        );
+
+        String fullUrl = apiUrl + "?key=" + apiKey;
 
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         Map<String, Object> systemInstruction = Map.of(
-                "parts", List.of(Map.of("text", SYSTEM_PROMPT))
+                "parts", List.of(Map.of("text", dynamicSystemPrompt))
         );
 
         Map<String, Object> userContent = Map.of(
@@ -66,8 +83,7 @@ public class ChatServiceImpl implements ChatService {
         String aiReply = "";
 
         try {
-
-            ResponseEntity<Map> response = restTemplate.postForEntity(apiUrl, entity, Map.class);
+            ResponseEntity<Map> response = restTemplate.postForEntity(fullUrl, entity, Map.class);
 
             if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
                 List candidates = (List) response.getBody().get("candidates");
@@ -80,20 +96,122 @@ public class ChatServiceImpl implements ChatService {
                 }
             }
         } catch (Exception e) {
-            log.error("Exception in processChat method", e);
+            log.error("Error communicating with Gemini API", e);
             aiReply = "Sorry, I am having trouble connecting to AI services right now. Please try again later.";
         }
 
-        ChatLog chatLog = new ChatLog();
-        chatLog.setUserEmail(userEmail);
-        chatLog.setUserRole(userRole);
-        chatLog.setUserPrompt(userPrompt);
-        chatLog.setAiResponse(aiReply);
-        chatLog.setCreatedAt(LocalDateTime.now());
-
-        chatLogRepository.save(chatLog);
+        try {
+            ChatLog chatLog = new ChatLog();
+            chatLog.setUserEmail(userEmail);
+            chatLog.setUserRole(userRole);
+            chatLog.setUserPrompt(userPrompt);
+            chatLog.setAiResponse(aiReply);
+            chatLog.setCreatedAt(LocalDateTime.now());
+            chatLogRepository.save(chatLog);
+        } catch (Exception e) {
+            log.error("Failed to save ChatLog", e);
+        }
 
         return new ChatResponseDTO(aiReply);
     }
 
+    private String buildRoleBasedContext(String userEmail, Role userRole, String userPrompt) {
+        StringBuilder context = new StringBuilder();
+
+        Map<String, Object> searchResults = aiToolsService.searchSystemData(userPrompt);
+        if (searchResults != null && !searchResults.isEmpty()) {
+            context.append("--- GLOBAL SEARCH RESULTS ---\n");
+            context.append(searchResults).append("\n\n");
+        }
+
+        ProductResponseDTO productInfo = aiToolsService.getProductInformation(userPrompt);
+        if (productInfo != null) {
+            context.append("--- SPECIFIC PRODUCT INFO ---\n");
+            context.append(String.format("Code: %s | Name: %s | Price: %.2f | Qty: %d | Category: %s\n\n",
+                    productInfo.getProductCode(), productInfo.getProductName(), productInfo.getUnitPrice(),
+                    productInfo.getAvailableQty(), productInfo.getCategoryName()));
+        }
+
+        List<String> categories = aiToolsService.getCategoryList();
+        if (categories != null && !categories.isEmpty()) {
+            context.append("--- PRODUCT CATEGORIES ---\n");
+            for (String category : categories) {
+                context.append("- ").append(category).append("\n");
+            }
+            context.append("\n");
+        }
+
+        OrderInvoiceReportDTO orderDetails = aiToolsService.getOrderDetailsAndStatus(userPrompt);
+        if (orderDetails != null) {
+            context.append("--- ORDER DETAILS ---\n");
+            context.append(String.format("Order Code: %s | Customer: %s | Status: %s | Date: %s\n\n",
+                    orderDetails.getOrderCode(), orderDetails.getCustomerName(), orderDetails.getOrderStatus(), orderDetails.getOrderDate()));
+        }
+
+        ShipmentResponseDTO shipmentDetails = aiToolsService.getShipmentTrackingDetails(userPrompt);
+        if (shipmentDetails != null) {
+            context.append("--- SHIPMENT TRACKING DETAILS ---\n");
+            context.append(String.format("Tracking No: %s | Status: %s | Driver: %s\n\n",
+                    shipmentDetails.getTrackingNumber(), shipmentDetails.getStatus(), shipmentDetails.getDriverName()));
+        }
+
+        UserResponseDTO profile = aiToolsService.getUserProfileDetails(userEmail);
+        if (profile != null) {
+            context.append("--- CURRENT USER PROFILE ---\n");
+            context.append(String.format("Code: %s | Name: %s | Shop: %s | Status: %s\n\n",
+                    profile.getUserCode(), profile.getFullName(), profile.getShopName(), profile.getProfileStatus()));
+        }
+
+        List<String> notifications = aiToolsService.getNotificationHistory(userEmail);
+        if (notifications != null && !notifications.isEmpty()) {
+            context.append("--- USER NOTIFICATIONS ---\n");
+            for (String notif : notifications) {
+                context.append(notif).append("\n");
+            }
+            context.append("\n");
+        }
+
+        if (userRole == Role.ROLE_ADMIN) {
+
+            AdminDashboardDTO overview = aiToolsService.getSystemOverviewData();
+            if (overview != null) {
+                context.append("--- ADMIN SYSTEM OVERVIEW ---\n");
+                context.append(String.format("Total Revenue: %.2f | Pending Orders: %d | Low Stock Count: %d\n\n",
+                        overview.getTotalRevenue(), overview.getPendingOrderCount(), overview.getLowStockProductsCount()));
+            }
+
+            List<DriverStatus> availableDrivers = aiToolsService.getDriverAvailabilityStatus(DriverStatus.AVAILABLE);
+            context.append("--- DRIVER AVAILABILITY ---\n");
+            context.append("Available Drivers Count: ").append(availableDrivers != null ? availableDrivers.size() : 0).append("\n\n");
+
+            List<RestockResponseDTO> restocks = aiToolsService.getSupplierAndRestockHistory("");
+            if (restocks != null && !restocks.isEmpty()) {
+                context.append("--- RESTOCK & SUPPLIER HISTORY ---\n");
+                for (RestockResponseDTO restock : restocks) {
+                    context.append(String.format("RestockCode: %s | Supplier: %s | Cost: %.2f\n",
+                            restock.getRestockCode(), restock.getSupplierName(), restock.getTotalCost()));
+                }
+                context.append("\n");
+            }
+
+            List<String> auditLogs = aiToolsService.getAuditLogSummary(userEmail);
+            if (auditLogs != null && !auditLogs.isEmpty()) {
+                context.append("--- SYSTEM AUDIT LOGS ---\n");
+                for (String logMsg : auditLogs) {
+                    context.append(logMsg).append("\n");
+                }
+                context.append("\n");
+            }
+        } else if (userRole == Role.ROLE_RETAILER) {
+
+            Map<String, Object> creditDetails = aiToolsService.getRetailerCreditAndLedgerDetails(userEmail);
+            if (creditDetails != null && !creditDetails.isEmpty()) {
+                context.append("--- YOUR CREDIT & LEDGER HISTORY ---\n");
+                context.append("Credit Limit: ").append(creditDetails.get("creditLimit")).append("\n");
+                context.append("Ledger History: ").append(creditDetails.get("ledgerHistory")).append("\n\n");
+            }
+        }
+
+        return context.toString();
+    }
 }

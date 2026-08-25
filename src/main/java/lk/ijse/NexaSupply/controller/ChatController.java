@@ -35,9 +35,9 @@ public class ChatController {
             break;
         }
 
-        ChatResponseDTO responseDTO = chatService.processChat(requestDTO, userEmail, userRole);
+        ChatResponseDTO response = chatService.processChat(requestDTO, userEmail, userRole);
 
-        return new CommonResponse(200, responseDTO, "Success");
+        return new CommonResponse(200, response, "Success");
     }
 
 }
