@@ -9,6 +9,7 @@ import lk.ijse.NexaSupply.dto.report.OrderInvoiceReportDTO;
 import lk.ijse.NexaSupply.dto.restock.RestockResponseDTO;
 import lk.ijse.NexaSupply.dto.shipment.ShipmentResponseDTO;
 import lk.ijse.NexaSupply.entity.ChatLog;
+import lk.ijse.NexaSupply.enumeration.ChatIntent;
 import lk.ijse.NexaSupply.enumeration.DriverStatus;
 import lk.ijse.NexaSupply.enumeration.Role;
 import lk.ijse.NexaSupply.repository.ChatLogRepository;
@@ -118,97 +119,130 @@ public class ChatServiceImpl implements ChatService {
     private String buildRoleBasedContext(String userEmail, Role userRole, String userPrompt) {
         StringBuilder context = new StringBuilder();
 
-        Map<String, Object> searchResults = aiToolsService.searchSystemData(userPrompt);
-        if (searchResults != null && !searchResults.isEmpty()) {
-            context.append("--- GLOBAL SEARCH RESULTS ---\n");
-            context.append(searchResults).append("\n\n");
-        }
-
-        ProductResponseDTO productInfo = aiToolsService.getProductInformation(userPrompt);
-        if (productInfo != null) {
-            context.append("--- SPECIFIC PRODUCT INFO ---\n");
-            context.append(String.format("Code: %s | Name: %s | Price: %.2f | Qty: %d | Category: %s\n\n",
-                    productInfo.getProductCode(), productInfo.getProductName(), productInfo.getUnitPrice(),
-                    productInfo.getAvailableQty(), productInfo.getCategoryName()));
-        }
-
-        List<String> categories = aiToolsService.getCategoryList();
-        if (categories != null && !categories.isEmpty()) {
-            context.append("--- PRODUCT CATEGORIES ---\n");
-            for (String category : categories) {
-                context.append("- ").append(category).append("\n");
+        if (ChatIntent.GLOBAL_SEARCH.matches(userPrompt)) {
+            Map<String, Object> searchResults = aiToolsService.searchSystemData(userPrompt);
+            if (searchResults != null && !searchResults.isEmpty()) {
+                context.append("--- GLOBAL SEARCH RESULTS ---\n");
+                context.append(searchResults).append("\n\n");
             }
-            context.append("\n");
         }
 
-        OrderInvoiceReportDTO orderDetails = aiToolsService.getOrderDetailsAndStatus(userPrompt);
-        if (orderDetails != null) {
-            context.append("--- ORDER DETAILS ---\n");
-            context.append(String.format("Order Code: %s | Customer: %s | Status: %s | Date: %s\n\n",
-                    orderDetails.getOrderCode(), orderDetails.getCustomerName(), orderDetails.getOrderStatus(), orderDetails.getOrderDate()));
-        }
-
-        ShipmentResponseDTO shipmentDetails = aiToolsService.getShipmentTrackingDetails(userPrompt);
-        if (shipmentDetails != null) {
-            context.append("--- SHIPMENT TRACKING DETAILS ---\n");
-            context.append(String.format("Tracking No: %s | Status: %s | Driver: %s\n\n",
-                    shipmentDetails.getTrackingNumber(), shipmentDetails.getStatus(), shipmentDetails.getDriverName()));
-        }
-
-        UserResponseDTO profile = aiToolsService.getUserProfileDetails(userEmail);
-        if (profile != null) {
-            context.append("--- CURRENT USER PROFILE ---\n");
-            context.append(String.format("Code: %s | Name: %s | Shop: %s | Status: %s\n\n",
-                    profile.getUserCode(), profile.getFullName(), profile.getShopName(), profile.getProfileStatus()));
-        }
-
-        List<String> notifications = aiToolsService.getNotificationHistory(userEmail);
-        if (notifications != null && !notifications.isEmpty()) {
-            context.append("--- USER NOTIFICATIONS ---\n");
-            for (String notif : notifications) {
-                context.append(notif).append("\n");
+        if (ChatIntent.PRODUCT_INFO.matches(userPrompt)) {
+            ProductResponseDTO productInfo = aiToolsService.getProductInformation(userPrompt);
+            if (productInfo != null) {
+                context.append("--- SPECIFIC PRODUCT INFO ---\n");
+                context.append(String.format("Code: %s | Name: %s | Price: %.2f | Qty: %d | Category: %s\n\n",
+                        productInfo.getProductCode(), productInfo.getProductName(), productInfo.getUnitPrice(),
+                        productInfo.getAvailableQty(), productInfo.getCategoryName()));
             }
-            context.append("\n");
+        }
+
+        if (ChatIntent.CATEGORIES.matches(userPrompt)) {
+            List<String> categories = aiToolsService.getCategoryList();
+            if (categories != null && !categories.isEmpty()) {
+                context.append("--- PRODUCT CATEGORIES ---\n");
+                for (String category : categories) {
+                    context.append("- ").append(category).append("\n");
+                }
+                context.append("\n");
+            }
+        }
+
+        if (ChatIntent.ORDER_DETAILS.matches(userPrompt)) {
+            OrderInvoiceReportDTO orderDetails = aiToolsService.getOrderDetailsAndStatus(userPrompt);
+            if (orderDetails != null) {
+                context.append("--- ORDER DETAILS ---\n");
+                context.append(String.format("Order Code: %s | Customer: %s | Status: %s | Date: %s\n\n",
+                        orderDetails.getOrderCode(), orderDetails.getCustomerName(), orderDetails.getOrderStatus(), orderDetails.getOrderDate()));
+            }
+        }
+
+        if (ChatIntent.SHIPMENT_TRACKING.matches(userPrompt)) {
+            ShipmentResponseDTO shipmentDetails = aiToolsService.getShipmentTrackingDetails(userPrompt);
+            if (shipmentDetails != null) {
+                context.append("--- SHIPMENT TRACKING DETAILS ---\n");
+                context.append(String.format("Tracking No: %s | Status: %s | Driver: %s\n\n",
+                        shipmentDetails.getTrackingNumber(), shipmentDetails.getStatus(), shipmentDetails.getDriverName()));
+            }
+        }
+
+        if (ChatIntent.USER_PROFILE.matches(userPrompt)) {
+            UserResponseDTO profile = aiToolsService.getUserProfileDetails(userEmail);
+            if (profile != null) {
+                context.append("--- CURRENT USER PROFILE ---\n");
+                context.append(String.format("Code: %s | Name: %s | Shop: %s | Status: %s\n\n",
+                        profile.getUserCode(), profile.getFullName(), profile.getShopName(), profile.getProfileStatus()));
+            }
+        }
+
+        if (ChatIntent.NOTIFICATIONS.matches(userPrompt)) {
+            List<String> notifications = aiToolsService.getNotificationHistory(userEmail);
+            if (notifications != null && !notifications.isEmpty()) {
+                context.append("--- USER NOTIFICATIONS ---\n");
+                for (String notif : notifications) {
+                    context.append(notif).append("\n");
+                }
+                context.append("\n");
+            }
         }
 
         if (userRole == Role.ROLE_ADMIN) {
 
-            AdminDashboardDTO overview = aiToolsService.getSystemOverviewData();
-            if (overview != null) {
-                context.append("--- ADMIN SYSTEM OVERVIEW ---\n");
-                context.append(String.format("Total Revenue: %.2f | Pending Orders: %d | Low Stock Count: %d\n\n",
-                        overview.getTotalRevenue(), overview.getPendingOrderCount(), overview.getLowStockProductsCount()));
-            }
-
-            List<DriverStatus> availableDrivers = aiToolsService.getDriverAvailabilityStatus(DriverStatus.AVAILABLE);
-            context.append("--- DRIVER AVAILABILITY ---\n");
-            context.append("Available Drivers Count: ").append(availableDrivers != null ? availableDrivers.size() : 0).append("\n\n");
-
-            List<RestockResponseDTO> restocks = aiToolsService.getSupplierAndRestockHistory("");
-            if (restocks != null && !restocks.isEmpty()) {
-                context.append("--- RESTOCK & SUPPLIER HISTORY ---\n");
-                for (RestockResponseDTO restock : restocks) {
-                    context.append(String.format("RestockCode: %s | Supplier: %s | Cost: %.2f\n",
-                            restock.getRestockCode(), restock.getSupplierName(), restock.getTotalCost()));
+            if (ChatIntent.ADMIN_OVERVIEW.matches(userPrompt)) {
+                AdminDashboardDTO overview = aiToolsService.getSystemOverviewData();
+                if (overview != null) {
+                    context.append("--- ADMIN SYSTEM OVERVIEW ---\n");
+                    context.append(String.format("Total Revenue: %.2f | Pending Orders: %d | Low Stock Count: %d\n\n",
+                            overview.getTotalRevenue(), overview.getPendingOrderCount(), overview.getLowStockProductsCount()));
                 }
-                context.append("\n");
             }
 
-            List<String> auditLogs = aiToolsService.getAuditLogSummary(userEmail);
-            if (auditLogs != null && !auditLogs.isEmpty()) {
-                context.append("--- SYSTEM AUDIT LOGS ---\n");
-                for (String logMsg : auditLogs) {
-                    context.append(logMsg).append("\n");
-                }
-                context.append("\n");
+            if (ChatIntent.DRIVER_STATUS.matches(userPrompt)) {
+                List<DriverStatus> availableDrivers = aiToolsService.getDriverAvailabilityStatus(DriverStatus.AVAILABLE);
+                context.append("--- DRIVER AVAILABILITY ---\n");
+                context.append("Available Drivers Count: ").append(availableDrivers != null ? availableDrivers.size() : 0).append("\n\n");
             }
+
+            if (ChatIntent.RESTOCK_SUPPLIER.matches(userPrompt)) {
+                List<RestockResponseDTO> restocks = aiToolsService.getSupplierAndRestockHistory("");
+                if (restocks != null && !restocks.isEmpty()) {
+                    context.append("--- RESTOCK & SUPPLIER HISTORY ---\n");
+                    for (RestockResponseDTO restock : restocks) {
+                        context.append(String.format("RestockCode: %s | Supplier: %s | Cost: %.2f\n",
+                                restock.getRestockCode(), restock.getSupplierName(), restock.getTotalCost()));
+                    }
+                    context.append("\n");
+                }
+            }
+
+            if (ChatIntent.AUDIT_LOGS.matches(userPrompt)) {
+                List<String> auditLogs = aiToolsService.getAuditLogSummary(userEmail);
+                if (auditLogs != null && !auditLogs.isEmpty()) {
+                    context.append("--- SYSTEM AUDIT LOGS ---\n");
+                    for (String logMsg : auditLogs) {
+                        context.append(logMsg).append("\n");
+                    }
+                    context.append("\n");
+                }
+            }
+
         } else if (userRole == Role.ROLE_RETAILER) {
 
-            Map<String, Object> creditDetails = aiToolsService.getRetailerCreditAndLedgerDetails(userEmail);
-            if (creditDetails != null && !creditDetails.isEmpty()) {
-                context.append("--- YOUR CREDIT & LEDGER HISTORY ---\n");
-                context.append("Credit Limit: ").append(creditDetails.get("creditLimit")).append("\n");
-                context.append("Ledger History: ").append(creditDetails.get("ledgerHistory")).append("\n\n");
+            if (ChatIntent.CREDIT_LEDGER.matches(userPrompt)) {
+                Map<String, Object> creditDetails = aiToolsService.getRetailerCreditAndLedgerDetails(userEmail);
+                if (creditDetails != null && !creditDetails.isEmpty()) {
+                    context.append("--- YOUR CREDIT & LEDGER HISTORY ---\n");
+                    context.append("Credit Limit: ").append(creditDetails.get("creditLimit")).append("\n");
+                    context.append("Ledger History: ").append(creditDetails.get("ledgerHistory")).append("\n\n");
+                }
+            }
+        }
+
+        if (context.length() == 0) {
+            Map<String, Object> searchResults = aiToolsService.searchSystemData(userPrompt);
+            if (searchResults != null && !searchResults.isEmpty()) {
+                context.append("--- GLOBAL SEARCH RESULTS ---\n");
+                context.append(searchResults).append("\n\n");
             }
         }
 
