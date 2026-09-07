@@ -149,6 +149,6 @@ The REST API engine will initialize on `http://localhost:8080`.
 ## 🎓 Academic Credentials
 
 * **Coursework:** Final Comprehensive Software Project
-* **Module:** Architecture & Application Development (AAD)
+* **Module:** Advanced API Development (AAD)
 * **Institution:** Institute of Software Engineering (IJSE)
-* **Developer:** Induni Lakmini Palliyaguru
+* **Developer:** Induni Palliyaguru
