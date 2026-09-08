@@ -54,6 +54,7 @@ public class SupplierServiceImpl implements SupplierService {
 
         Optional<Supplier> supplierOptional = supplierRepository.findBySupplierCodeAndDataStatus(dto.getSupplierCode(), DataStatus.ACTIVE);
         if (supplierOptional.isEmpty()) {
+            log.error("Supplier not found");
             throw new CustomException(404, "Supplier Not Found with Code: " + dto.getSupplierCode());
         }
         Supplier supplier = supplierOptional.get();
@@ -76,6 +77,7 @@ public class SupplierServiceImpl implements SupplierService {
 
         Optional<Supplier> supplierOptional = supplierRepository.findBySupplierCodeAndDataStatus(supplierCode, DataStatus.ACTIVE);
         if (supplierOptional.isEmpty()) {
+            log.error("Supplier not found with Code: {}", supplierCode);
             throw new CustomException(404, "Supplier Not Found with Code: " + supplierCode);
         }
         Supplier supplier = supplierOptional.get();
@@ -106,6 +108,7 @@ public class SupplierServiceImpl implements SupplierService {
 
         Optional<Supplier> supplierOptional = supplierRepository.findBySupplierCodeAndDataStatus(supplierCode, DataStatus.ACTIVE);
         if (supplierOptional.isEmpty()) {
+            log.error("Supplier not found with Code : {}", supplierCode);
             throw new CustomException(404, "Supplier Not Found with Code: " + supplierCode);
         }
         Supplier supplier = supplierOptional.get();

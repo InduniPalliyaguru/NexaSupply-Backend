@@ -63,6 +63,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         Optional<Payment> optionalPayment = paymentRepository.findByPaymentCode(dto.getPaymentCode());
         if (optionalPayment.isEmpty()) {
+            log.error("Payment not found with code: {}", dto.getPaymentCode());
             throw new CustomException(404, "Payment not found with code: " + dto.getPaymentCode());
         }
         Payment payment = optionalPayment.get();
@@ -71,6 +72,7 @@ public class PaymentServiceImpl implements PaymentService {
         double newBalanceAmount = payment.getBalanceAmount() - dto.getPayingAmount();
 
         if (newBalanceAmount < 0) {
+            log.error("Balance amount is negative");
             throw new CustomException(400, "Paying amount exceeds the remaining balance!");
         }
 
@@ -87,6 +89,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         User customer = payment.getOrder().getCustomer();
         if (customer == null) {
+            log.error("Customer is null");
             throw new CustomException(404, "Customer not found!");
         }
         double newCreditLimit = customer.getCreditLimit() + dto.getPayingAmount();
@@ -120,6 +123,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         Optional<Payment> optionalPayment = paymentRepository.findByPaymentCode(paymentCode);
         if (optionalPayment.isEmpty()) {
+            log.error("Payment not found with code : {}", paymentCode);
             throw new CustomException(404, "Payment not found with code: " + paymentCode);
         }
         Payment payment = optionalPayment.get();
@@ -146,6 +150,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         Optional<Payment> optionalPayment = paymentRepository.findByOrder_OrderCode(orderCode);
         if (optionalPayment.isEmpty()) {
+            log.error("Payment not found with Order code: {}", orderCode);
             throw new CustomException(404, "Payment not found with order code: " + orderCode);
         }
         Payment payment = optionalPayment.get();
@@ -183,6 +188,7 @@ public class PaymentServiceImpl implements PaymentService {
 
             Order order = payment.getOrder();
             if (order == null || order.getCustomer() == null) {
+                log.error("Order or Customer not found with OrderCode: {}", payment.getPaymentCode());
                 throw new CustomException(404, "Order or customer not found for payment code: " + payment.getPaymentCode());
             }
             User customer = order.getCustomer();
@@ -253,6 +259,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         } catch (Exception e) {
             log.error("Failed to send final payment receipt email for payment code: {}", payment.getPaymentCode(), e);
+            throw new CustomException(500, "Failed to send email");
         }
 
     }

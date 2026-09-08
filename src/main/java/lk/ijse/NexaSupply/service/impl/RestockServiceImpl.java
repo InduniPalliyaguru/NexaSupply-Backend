@@ -47,6 +47,7 @@ public class RestockServiceImpl implements RestockService {
 
         Optional<Supplier> supplierOptional = supplierRepository.findBySupplierCodeAndDataStatus(dto.getSupplierCode(), DataStatus.ACTIVE);
         if (supplierOptional.isEmpty()) {
+            log.error("Active Supplier Not Found: {}", dto.getSupplierCode());
             throw new CustomException(404, "Active Supplier Not Found");
         }
         Supplier supplier = supplierOptional.get();
@@ -67,6 +68,7 @@ public class RestockServiceImpl implements RestockService {
 
             Optional<Product> optionalProduct = productRepository.findActiveByProductCode(item.getProductCode());
             if (optionalProduct.isEmpty()) {
+                log.error("Product Not Found: {}", item.getProductCode());
                 throw new CustomException(404, "Product Not Found: " + item.getProductCode());
             }
             Product product = optionalProduct.get();
@@ -118,6 +120,7 @@ public class RestockServiceImpl implements RestockService {
 
         Optional<Restock> byRestockCode = restockRepository.findByRestockCode(restockCode);
         if (byRestockCode.isEmpty()) {
+            log.error("Restock Code Not Found:{}", restockCode);
             throw new CustomException(404, "Restock Not Found: " + restockCode);
         }
 

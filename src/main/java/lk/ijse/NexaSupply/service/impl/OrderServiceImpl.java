@@ -53,6 +53,7 @@ public class OrderServiceImpl implements OrderService {
         Optional<User> optionalUser = userRepository.findActiveByEmail(currentUserEmail);
 
         if (optionalUser.isEmpty()) {
+            log.error("Customer not found with email: {}", currentUserEmail);
             throw new CustomException(404, "Customer Not Found");
         }
         User customer = optionalUser.get();
@@ -72,11 +73,13 @@ public class OrderServiceImpl implements OrderService {
 
             Optional<Product> optionalProduct = productRepository.findActiveByProductCode(itemDTO.getProductCode());
             if (optionalProduct.isEmpty()) {
+                log.error("Product not found with product code: {}", itemDTO.getProductCode());
                 throw new CustomException(404, "Product Not Found");
             }
             Product product = optionalProduct.get();
 
             if (product.getQuantity() < itemDTO.getQuantity()) {
+                log.error("Product Quantity Not Enough");
                 throw new CustomException(400, "Insufficient stock for product: " + product.getName());
             }
 
@@ -97,6 +100,7 @@ public class OrderServiceImpl implements OrderService {
         }
 
         if (customer.getCreditLimit() < calculatedTotal) {
+            log.error("Credit Limit Not Enough");
             throw new CustomException(400, "Insufficient credit limit! Available credit limit: " + customer.getCreditLimit());
         }
 
@@ -146,6 +150,7 @@ public class OrderServiceImpl implements OrderService {
 
         Optional<Order> optionalOrder = orderRepository.findByOrderCode(orderCode);
         if (optionalOrder.isEmpty()) {
+            log.error("Customer not found with order code: {}", orderCode);
             throw new CustomException(404, "Order Not Found with Order Code: " + orderCode);
         }
         Order order = optionalOrder.get();
@@ -208,6 +213,7 @@ public class OrderServiceImpl implements OrderService {
 
         Optional<Order> optionalOrder = orderRepository.findByOrderCode(orderCode);
         if (optionalOrder.isEmpty()) {
+            log.error("Order not found with order code: {}", orderCode);
             throw new CustomException(404, "Order Not Found with Order Code: " + orderCode);
         }
 
@@ -248,6 +254,7 @@ public class OrderServiceImpl implements OrderService {
 
         Optional<Order> optionalOrder = orderRepository.findByOrderCode(orderCode);
         if (optionalOrder.isEmpty()) {
+            log.error("Order not found with order code : {}", orderCode);
             throw new CustomException(404, "Order Not Found with Order Code: " + orderCode);
         }
         Order order = optionalOrder.get();
@@ -320,6 +327,7 @@ public class OrderServiceImpl implements OrderService {
 
             User customer = order.getCustomer();
             if (customer == null || customer.getEmail() == null) {
+                log.error("Customer or Email is null for Order Code: {}", order.getOrderCode());
                 throw new CustomException(404, "Customer or Email is null for Order Code " + order.getOrderCode());
             }
 
@@ -358,9 +366,8 @@ public class OrderServiceImpl implements OrderService {
             log.info("Invoice email send successfully");
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Failed to send invoice email for Order Code: {}. Error: {}", order.getOrderCode(), e.getMessage());
             throw new CustomException(500, "Failed to send email");
-
         }
     }
 

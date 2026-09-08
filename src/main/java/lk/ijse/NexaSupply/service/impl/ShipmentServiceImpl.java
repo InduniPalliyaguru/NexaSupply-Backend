@@ -49,16 +49,19 @@ public class ShipmentServiceImpl implements ShipmentService {
 
         Optional<Order> orderOptional = orderRepository.findByOrderCode(dto.getOrderCode());
         if (orderOptional.isEmpty()) {
+            log.error("Order Not Found with Code: {}", dto.getOrderCode());
             throw new CustomException(404, "Order Not Found with Code: " + dto.getOrderCode());
         }
 
         Optional<Shipment> existingShipment = shipmentRepository.findByOrderCodeActive(dto.getOrderCode());
         if (existingShipment.isPresent()) {
+            log.error("Shipment Already Exists");
             throw new CustomException(400, "Shipment Already Exists for Order Code: " + dto.getOrderCode());
         }
 
         Optional<Driver> driverOptional = driverRepository.findByDriverCode(dto.getDriverCode());
         if (driverOptional.isEmpty()) {
+            log.error("Driver Not Found with Code: {}", dto.getDriverCode());
             throw new CustomException(404, "Driver Not Found with Code: " + dto.getDriverCode());
         }
 
@@ -110,6 +113,7 @@ public class ShipmentServiceImpl implements ShipmentService {
 
         Optional<Shipment> shipmentOptional = shipmentRepository.findActiveByTrackingNumber(trackingNumber);
         if (shipmentOptional.isEmpty()) {
+            log.error("Shipment Not Found with Tracking: {}", trackingNumber);
             throw new CustomException(404, "Shipment Not Found with Tracking Number: " + trackingNumber);
         }
 
@@ -167,6 +171,7 @@ public class ShipmentServiceImpl implements ShipmentService {
 
         Optional<Shipment> shipmentOptional = shipmentRepository.findActiveByTrackingNumber(trackingNumber);
         if (shipmentOptional.isEmpty()) {
+            log.error("Shipment Not Found with Tracking : {}", trackingNumber);
             throw new CustomException(404, "Shipment Not Found with Tracking Number: " + trackingNumber);
         }
         Shipment shipment = shipmentOptional.get();
@@ -179,6 +184,7 @@ public class ShipmentServiceImpl implements ShipmentService {
 
         Optional<Shipment> shipmentOptional = shipmentRepository.findByOrderCodeActive(orderCode);
         if (shipmentOptional.isEmpty()) {
+            log.error("Shipment Not Found for Order Code: {}", orderCode);
             throw new CustomException(404, "Shipment Not Found for Order Code: " + orderCode);
         }
         Shipment shipment = shipmentOptional.get();
@@ -233,6 +239,7 @@ public class ShipmentServiceImpl implements ShipmentService {
 
         Optional<Shipment> shipmentOptional = shipmentRepository.findActiveByTrackingNumber(trackingNumber);
         if (shipmentOptional.isEmpty()) {
+            log.error("Shipment Not Found with Tracking Number: {}", trackingNumber);
             throw new CustomException(404, "Shipment Not Found with Tracking Number: " + trackingNumber);
         }
         Shipment shipment = shipmentOptional.get();
@@ -263,7 +270,6 @@ public class ShipmentServiceImpl implements ShipmentService {
             dto.setDriverCode(shipment.getDriver().getDriverCode());
             dto.setDriverName(shipment.getDriver().getDriverName());
         }
-
         return dto;
     }
 

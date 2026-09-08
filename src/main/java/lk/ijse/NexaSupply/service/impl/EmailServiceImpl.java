@@ -38,6 +38,7 @@ public class EmailServiceImpl implements EmailService {
             mailSender.send(message);
 
         } catch (Exception e) {
+            log.error("Failed to send email with attachment to {}:", e.getMessage());
             throw new CustomException(500, "Failed to send email with attachment to " + toEmail);
         }
 
@@ -124,6 +125,7 @@ public class EmailServiceImpl implements EmailService {
 
         } catch (Exception e) {
             log.error("Failed to send shipment creation email to {}: ", toEmail, e);
+            throw new CustomException(500, "Failed to send shipment email to " + toEmail);
         }
 
     }
@@ -168,6 +170,7 @@ public class EmailServiceImpl implements EmailService {
 
         } catch (Exception e) {
             log.error("Failed to send shipment status update email to {}: ", toEmail, e);
+            throw new CustomException(500, "Failed to send shipment status update email to " + toEmail);
         }
 
     }
@@ -207,4 +210,5 @@ public class EmailServiceImpl implements EmailService {
             throw new CustomException(500, "Email sending failed. Please try again later.");
         }
     }
+
 }

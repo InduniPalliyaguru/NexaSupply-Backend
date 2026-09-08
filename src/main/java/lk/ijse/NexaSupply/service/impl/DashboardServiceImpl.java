@@ -61,6 +61,7 @@ public class DashboardServiceImpl implements DashboardService {
         String currentUserEmail = SecurityUtils.getCurrentUserEmail();
         Optional<User> optionalUser = userRepository.findActiveByEmail(currentUserEmail);
         if (optionalUser.isEmpty()) {
+            log.error("Retailer account not found for email: {}", currentUserEmail);
             throw new CustomException(404, "Retailer account not found!");
         }
         User retailer = optionalUser.get();
@@ -89,4 +90,5 @@ public class DashboardServiceImpl implements DashboardService {
         );
 
     }
+
 }

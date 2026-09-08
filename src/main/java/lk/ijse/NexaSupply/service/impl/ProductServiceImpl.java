@@ -36,6 +36,7 @@ public class ProductServiceImpl implements ProductService {
 
         Optional<Category> category = categoryRepository.findActiveByCategoryCode(request.getCategoryCode());
         if (category.isEmpty()) {
+            log.error("Category not found");
             throw new CustomException(404, "Category not found");
         }
         long count = productRepository.countAllProducts() + 1;
@@ -66,11 +67,13 @@ public class ProductServiceImpl implements ProductService {
 
         Optional<Product> optionalProduct = productRepository.findActiveByProductCode(request.getProductCode());
         if (optionalProduct.isEmpty()) {
+            log.error("Product not found");
             throw new CustomException(404, "Product not found");
         }
 
         Optional<Category> optionalCategory = categoryRepository.findActiveByCategoryCode(request.getCategoryCode());
         if (optionalCategory.isEmpty()) {
+            log.error("Category not found ");
             throw new CustomException(404, "Category not found");
         }
 
@@ -101,6 +104,7 @@ public class ProductServiceImpl implements ProductService {
 
         Optional<Product> optionalProduct = productRepository.findActiveByProductCode(productCode);
         if (optionalProduct.isEmpty()) {
+            log.error("Product not found ");
             throw new CustomException(404, "Product not found");
         }
         Product product = optionalProduct.get();
@@ -169,6 +173,7 @@ public class ProductServiceImpl implements ProductService {
 
         Optional<Product> optionalProduct = productRepository.findActiveByProductCode(productCode);
         if (optionalProduct.isEmpty()) {
+            log.error("Product not found with code {}", productCode);
             throw new CustomException(404, "Product not found");
         }
 

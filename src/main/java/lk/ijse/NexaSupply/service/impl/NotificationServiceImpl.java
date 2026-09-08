@@ -32,6 +32,7 @@ public class NotificationServiceImpl implements NotificationService {
         log.info("Execute createNotification method");
 
         if (recipient == null) {
+            log.error("Recipient is null");
             throw new CustomException(400, "Recipient user cannot be null");
         }
 
@@ -75,6 +76,7 @@ public class NotificationServiceImpl implements NotificationService {
 
         Optional<Notification> notification = notificationRepository.findByNotificationIdAndDataStatus(notificationId, DataStatus.ACTIVE);
         if (notification.isEmpty()) {
+            log.error("Notification with id {} not found", notificationId);
             throw new CustomException(400, "Notification not found");
         }
         Notification notify = notification.get();
@@ -102,6 +104,7 @@ public class NotificationServiceImpl implements NotificationService {
 
         Optional<Notification> notification = notificationRepository.findByNotificationIdAndDataStatus(notificationId, DataStatus.ACTIVE);
         if (notification.isEmpty()) {
+            log.error("Notification with id: {} not found ", notificationId);
             throw new CustomException(400, "Notification not found");
         }
         Notification notify = notification.get();
@@ -114,12 +117,14 @@ public class NotificationServiceImpl implements NotificationService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || !authentication.isAuthenticated()) {
+            log.error("Authentication is null");
             throw new CustomException(401, "User is not authenticated!");
         }
         String email = authentication.getName();
 
         Optional<User> activeByEmail = userRepository.findActiveByEmail(email);
         if (activeByEmail.isEmpty()) {
+            log.error("User with email {} not found", email);
             throw new CustomException(404, "Authenticated user not found!");
         }
         return activeByEmail.get();

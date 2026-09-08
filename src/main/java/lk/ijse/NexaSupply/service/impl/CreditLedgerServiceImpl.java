@@ -34,6 +34,7 @@ public class CreditLedgerServiceImpl implements CreditLedgerService {
 
         Optional<User> optionalUser = userRepository.findByUserCodeAndDataStatus(dto.getUserCode(), DataStatus.ACTIVE);
         if (optionalUser.isEmpty()) {
+            log.error("User not found");
             throw new CustomException(404, "Customer Not Found with code " + dto.getUserCode());
         }
         User customer = optionalUser.get();

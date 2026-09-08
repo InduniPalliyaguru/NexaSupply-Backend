@@ -47,6 +47,7 @@ public class UserServiceImpl implements UserService {
         log.info("Execute Register Retailer method");
 
         if (userRepository.existsActiveByEmail(request.getEmail())) {
+            log.error("Email is already registered: {}", request.getEmail());
             throw new CustomException(400, "Email is already registered");
         }
 
@@ -78,6 +79,7 @@ public class UserServiceImpl implements UserService {
         log.info("Execute Register Admin method");
 
         if (userRepository.existsActiveByEmail(request.getEmail())) {
+            log.error("Email is already registered : {}", request.getEmail());
             throw new CustomException(400, "Email is already registered");
         }
         int currentYear = Year.now().getValue();
@@ -105,17 +107,21 @@ public class UserServiceImpl implements UserService {
         Optional<User> activeByEmail = userRepository.findActiveByEmail(email);
 
         if (activeByEmail.isEmpty()) {
+            log.error("Email is not registered : {}", email);
             throw new CustomException(404, "User Not found with email: " + email);
         }
 
         User user = activeByEmail.get();
         if (!passwordEncoder.matches(password, user.getPassword())) {
+            log.error("Password is not matching");
             throw new CustomException(401, "Password doesn't match!");
         }
         if (user.getProfileStatus() == ProfileStatus.PENDING) {
+            log.error("Profile Status is PENDING");
             throw new CustomException(403, "Your account is pending admin approval!");
         }
         if (user.getProfileStatus() == ProfileStatus.REJECTED) {
+            log.error("Profile Status is REJECTED");
             throw new CustomException(403, "Your account has been rejected by admin!");
         }
 
@@ -137,6 +143,7 @@ public class UserServiceImpl implements UserService {
 
         Optional<User> optionalUser = userRepository.findByUserCodeAndDataStatus(userCode, DataStatus.ACTIVE);
         if (optionalUser.isEmpty()) {
+            log.error("User not found with code {}", userCode);
             throw new CustomException(404, "User not found with code: " + userCode);
         }
         User user = optionalUser.get();
@@ -171,6 +178,7 @@ public class UserServiceImpl implements UserService {
 
         Optional<User> optionalUser = userRepository.findByUserCodeAndDataStatus(userCode, DataStatus.ACTIVE);
         if (optionalUser.isEmpty()) {
+            log.error("User not found with code: {}", userCode);
             throw new CustomException(404, "User not found with code: " + userCode);
         }
         User user = optionalUser.get();
@@ -213,6 +221,7 @@ public class UserServiceImpl implements UserService {
 
         Optional<User> active = userRepository.findActiveByEmail(email);
         if (active.isEmpty()) {
+            log.error("User not found with email: {}", email);
             throw new CustomException(404, "User not found with email: " + email);
         }
         User user = active.get();
@@ -244,6 +253,7 @@ public class UserServiceImpl implements UserService {
 
         Optional<User> optionalUser = userRepository.findByUserCodeAndDataStatus(userCode, DataStatus.ACTIVE);
         if (optionalUser.isEmpty()) {
+            log.error("User not found with User code: {}", userCode);
             throw new CustomException(404, "User not found with code: " + userCode);
         }
         User user = optionalUser.get();
@@ -260,6 +270,7 @@ public class UserServiceImpl implements UserService {
 
         Optional<User> activeByEmail = userRepository.findActiveByEmail(email);
         if (activeByEmail.isEmpty()) {
+            log.error("User not found with email : {}", email);
             throw new CustomException(404, "User not found with email: " + email);
         }
         User user = activeByEmail.get();
@@ -281,6 +292,7 @@ public class UserServiceImpl implements UserService {
 
         Optional<User> activeByEmail = userRepository.findActiveByEmail(dto.getEmail());
         if (activeByEmail.isEmpty()) {
+            log.error("User not found with user email: {}", dto.getEmail());
             throw new CustomException(404, "User not found with email: " + dto.getEmail());
         }
         User user = activeByEmail.get();
@@ -304,11 +316,13 @@ public class UserServiceImpl implements UserService {
 
         Optional<PasswordResetOtp> resetOtp = passwordResetOtpRepository.findTopByEmailAndOtpCodeAndIsUsedFalseOrderByExpiryTimeDesc(dto.getEmail(), dto.getOtpCode());
         if (resetOtp.isEmpty()) {
+            log.error("Invalid OTP code found");
             throw new CustomException(404, "Invalid or expired OTP code");
         }
         PasswordResetOtp otp = resetOtp.get();
 
         if (otp.getExpiryTime().isBefore(LocalDateTime.now())) {
+            log.error("OTP expired");
             throw new CustomException(404, "OTP code has expired. Please request a new one.");
         }
         return true;
@@ -320,16 +334,19 @@ public class UserServiceImpl implements UserService {
 
         Optional<PasswordResetOtp> resetOtp = passwordResetOtpRepository.findTopByEmailAndOtpCodeAndIsUsedFalseOrderByExpiryTimeDesc(dto.getEmail(), dto.getOtpCode());
         if (resetOtp.isEmpty()) {
+            log.error("Invalid OTP code found ");
             throw new CustomException(404, "Invalid or expired OTP code");
         }
         PasswordResetOtp otp = resetOtp.get();
 
         if (otp.getExpiryTime().isBefore(LocalDateTime.now())) {
+            log.error("OTP expired ");
             throw new CustomException(404, "OTP code has expired. Please request a new one.");
         }
 
         Optional<User> activeByEmail = userRepository.findActiveByEmail(dto.getEmail());
         if (activeByEmail.isEmpty()) {
+            log.error("User not found with user email : {}", dto.getEmail());
             throw new CustomException(404, "User not found with email: " + dto.getEmail());
         }
         User user = activeByEmail.get();

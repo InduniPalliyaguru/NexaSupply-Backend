@@ -218,7 +218,7 @@ public class AiToolServiceImpl implements AiToolsService {
             }
             return dto;
         }
-
+        log.warn("No shipment details for trackingNumber / orderCode: {}", trackingNumberOrOrderCode);
         return null;
     }
 
@@ -281,6 +281,7 @@ public class AiToolServiceImpl implements AiToolsService {
             dto.setCreditLimit(user.getCreditLimit());
             return dto;
         }
+        log.warn("No Profile details found matching email / userCode: {}", emailOrUserCode);
         return null;
     }
 

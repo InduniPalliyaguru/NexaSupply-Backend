@@ -34,9 +34,11 @@ public class DriverServiceImpl implements DriverService {
         log.info("Execute saveDrive method");
 
         if (driverRepository.existsByPhoneAndDataStatus(dto.getPhone(), DataStatus.ACTIVE)) {
+            log.error("Phone number already exists: {}", dto.getPhone());
             throw new CustomException(400, "Phone number already exists!");
         }
         if (driverRepository.existsByLicenseNoAndDataStatus(dto.getLicenseNo(), DataStatus.ACTIVE)) {
+            log.error("License number already exists: {}", dto.getLicenseNo());
             throw new CustomException(400, "License number already exists!");
         }
 
@@ -62,6 +64,7 @@ public class DriverServiceImpl implements DriverService {
 
         Optional<Driver> optionalDriver = driverRepository.findByDriverCode(driverCode);
         if (optionalDriver.isEmpty()) {
+            log.error("Driver code not found: {}", driverCode);
             throw new CustomException(404, "Driver not found with code: " + driverCode);
         }
         Driver driver = optionalDriver.get();
@@ -103,6 +106,7 @@ public class DriverServiceImpl implements DriverService {
 
         Optional<Driver> optionalDriver = driverRepository.findByDriverCode(driverCode);
         if (optionalDriver.isEmpty()) {
+            log.error("Driver code not found with: {}", driverCode);
             throw new CustomException(404, "Driver not found with code: " + driverCode);
         }
         Driver driver = optionalDriver.get();
@@ -128,6 +132,7 @@ public class DriverServiceImpl implements DriverService {
 
         Optional<Driver> optionalDriver = driverRepository.findByDriverCode(driverCode);
         if (optionalDriver.isEmpty()) {
+            log.error("Driver code not found with code: {}", driverCode);
             throw new CustomException(404, "Driver not found with code: " + driverCode);
         }
         Driver driver = optionalDriver.get();
@@ -147,6 +152,7 @@ public class DriverServiceImpl implements DriverService {
 
         Optional<Driver> optionalDriver = driverRepository.findByDriverCode(driverCode);
         if (optionalDriver.isEmpty()) {
+            log.error("Driver code not found with id: {}", driverCode);
             throw new CustomException(404, "Driver not found with code: " + driverCode);
         }
         Driver driver = optionalDriver.get();

@@ -31,6 +31,7 @@ public class CategoryServiceImpl implements CategoryService {
         log.info("Execute createCategory Method");
 
         if (categoryRepository.existsByNameAndDataStatus(categoryDTO.getCategoryName(), DataStatus.ACTIVE)) {
+            log.error("Category already exists");
             throw new CustomException(400, "Category with name '" + categoryDTO.getCategoryName() + "' already exists!");
         }
 
@@ -57,6 +58,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         Optional<Category> optional = categoryRepository.findActiveByCategoryCode(categoryDTO.getCategoryCode());
         if (optional.isEmpty()) {
+            log.error("Category not found");
             throw new CustomException(400, "Category with code '" + categoryDTO.getCategoryCode() + "' not found!");
         }
 
@@ -80,6 +82,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         Optional<Category> optional = categoryRepository.findActiveByCategoryCode(categoryCode);
         if (optional.isEmpty()) {
+            log.error("Category not found with code '{}'", categoryCode);
             throw new CustomException(400, "Category with code '" + categoryCode + "' not found!");
         }
 
@@ -107,6 +110,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         Optional<Category> optional = categoryRepository.findActiveByCategoryCode(categoryCode);
         if (optional.isEmpty()) {
+            log.error("Category not found with code :'{}'", categoryCode);
             throw new CustomException(400, "Category with code '" + categoryCode + "' not found!");
         }
 
